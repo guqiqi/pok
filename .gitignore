@@ -1,0 +1,10 @@
+*.o
+*.lo
+*.mk
+*.depend
+*.img
+*.elf
+*.map
+*.bin
+*.a
+*.pid

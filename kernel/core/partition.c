@@ -247,8 +247,10 @@ pok_ret_t pok_partition_init ()
       pok_partitions[i].lock_level = 0;
       pok_partitions[i].start_condition = NORMAL_START;
 
+      pok_partitions[i].current_weight = 0;
+
 #ifdef POK_NEEDS_INSTRUMENTATION
-      pok_instrumentation_partition_archi (i);
+          pok_instrumentation_partition_archi(i);
 #endif
 
       pok_partition_setup_main_thread (i);

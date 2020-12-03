@@ -11,25 +11,32 @@
  *
  *                                      Copyright (c) 2007-2009 POK team 
  *
- * Created by julien on Wed Feb 18 19:05:30 2009 
+ * Created by julien on Thu Jan 15 23:34:13 2009 
  */
 
 
-#ifndef __POK_SCHEDVALUES_H__
-#define __POK_SCHEDVALUES_H__
+#include <core/thread.h>
+#include <core/partition.h>
+#include <types.h>
+#include "activity.h"
 
-typedef enum
+
+int main ()
 {
-   POK_SCHED_FIFO             = 0,
-   POK_SCHED_RR               = 1,
-   POK_SCHED_GLOBAL_TIMESLICE = 2,
-   POK_SCHED_RMS              = 3,
-   POK_SCHED_EDF              = 4,
-   POK_SCHED_LLF              = 5,
-   POK_SCHED_PRIORITY         = 6,
-   POK_SCHED_WRR              = 7,
-   POK_SCHED_STATIC           = 8
-} pok_sched_t;
+  uint8_t tid;
+  int ret;
+  pok_thread_attr_t     tattr;
 
-#endif
+  tattr.priority = 42;
+  tattr.entry = pinger_job;
+
+  ret = pok_thread_create(&tid , &tattr);
+  printf ("[P2] thread create returns=%d\n", ret);
+
+  pok_partition_set_mode (POK_PARTITION_MODE_NORMAL);
+  pok_thread_wait_infinite ();
+
+  return (1);
+}
+
 

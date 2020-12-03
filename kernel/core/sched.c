@@ -502,6 +502,184 @@ uint32_t pok_sched_part_rr (const uint32_t index_low, const uint32_t index_high,
    return res;
 }
 
+uint32_t pok_sched_part_priority (const uint32_t index_low, const uint32_t index_high,const uint32_t __attribute__((unused)) prev_thread,const uint32_t __attribute__((unused)) current_thread)
+{
+   uint32_t res;
+   uint32_t from;
+
+   from = prev_thread;
+
+   res= index_low;
+
+   uint8_t max_priority = -1;
+   uint32_t max_priority_thread = IDLE_THREAD;
+
+   do
+   {
+      if (res >= index_high)
+      {
+         res = index_low;
+      }
+
+      if(pok_threads[res].priority > max_priority && pok_threads[res].state == POK_STATE_RUNNABLE)
+      {
+         max_priority = pok_threads[res].priority;
+         max_priority_thread = res;
+      }
+
+      res++;
+   }
+   while (res != index_low);
+
+#ifdef POK_NEEDS_DEBUG
+    if ( res!= IDLE_THREAD)
+    {
+        printf("--- scheduling thread: %d {%d} --- ", res,
+	       pok_threads[res].period);
+        from=index_low;
+        while ( from <= index_high )
+        {
+            if ( pok_threads[from].state==POK_STATE_RUNNABLE )
+            {
+                printf(" %d {%d} ,",from,pok_threads[from].period);
+            }
+            from++;
+        }
+        printf(" are runnable; \n\t\t");
+        from=index_low;	
+	while ( from <= index_high )
+        {
+            if ( pok_threads[from].state!=POK_STATE_RUNNABLE )
+            {
+                printf(" %d (state = %d)",from,pok_threads[from].state);
+            }
+            from++;
+        }
+        printf(" are NOT runnable;\n");
+
+    }
+#endif
+
+   return max_priority_thread;
+}/* POK_NEEDS_SCHED_PRIORITY */
+
+uint32_t pok_sched_part_edf (const uint32_t index_low, const uint32_t index_high,const uint32_t __attribute__((unused)) prev_thread,const uint32_t __attribute__((unused)) current_thread)
+{
+   // TODO
+   uint32_t res;
+#ifdef POK_NEEDS_DEBUG
+   uint32_t from;
+   from = prev_thread;
+#endif
+
+   res= index_low;
+
+   do
+   {
+      res++;
+      if (res >= index_high)
+      {
+         res = index_low;
+      }
+   }
+   while ((res != index_low) &&
+	  (pok_threads[res].state != POK_STATE_RUNNABLE));
+
+   if ((res == index_low) && (pok_threads[res].state != POK_STATE_RUNNABLE))
+   {
+      res = IDLE_THREAD;
+   }
+
+#ifdef POK_NEEDS_DEBUG
+    if ( res!= IDLE_THREAD)
+    {
+        printf("--- scheduling thread: %d {%d} --- ", res,
+	       pok_threads[res].period);
+        from=index_low;
+        while ( from <= index_high )
+        {
+            if ( pok_threads[from].state==POK_STATE_RUNNABLE )
+            {
+                printf(" %d {%d} ,",from,pok_threads[from].period);
+            }
+            from++;
+        }
+        printf(" are runnable; \n\t\t");
+        from=index_low;	
+	while ( from <= index_high )
+        {
+            if ( pok_threads[from].state!=POK_STATE_RUNNABLE )
+            {
+                printf(" %d (state = %d)",from,pok_threads[from].state);
+            }
+            from++;
+        }
+        printf(" are NOT runnable;\n");
+
+    }
+#endif
+
+   return res;
+}/* POK_NEEDS_SCHED_EDF */
+
+uint32_t pok_sched_part_wrr (const uint32_t index_low, const uint32_t index_high,const uint32_t __attribute__((unused)) prev_thread,const uint32_t __attribute__((unused)) current_thread)
+{
+   // TODO
+   uint32_t res;
+#ifdef POK_NEEDS_DEBUG
+   uint32_t from;
+   from = prev_thread;
+#endif
+
+   res= index_low;
+
+   do
+   {
+      res++;
+      if (res >= index_high)
+      {
+         res = index_low;
+      }
+   }
+   while ((res != index_low) &&
+	  (pok_threads[res].state != POK_STATE_RUNNABLE));
+
+   if ((res == index_low) && (pok_threads[res].state != POK_STATE_RUNNABLE))
+   {
+      res = IDLE_THREAD;
+   }
+
+#ifdef POK_NEEDS_DEBUG
+    if ( res!= IDLE_THREAD)
+    {
+        printf("--- scheduling thread: %d {%d} --- ", res,
+	       pok_threads[res].period);
+        from=index_low;
+        while ( from <= index_high )
+        {
+            if ( pok_threads[from].state==POK_STATE_RUNNABLE )
+            {
+                printf(" %d {%d} ,",from,pok_threads[from].period);
+            }
+            from++;
+        }
+        printf(" are runnable; \n\t\t");
+        from=index_low;	
+	while ( from <= index_high )
+        {
+            if ( pok_threads[from].state!=POK_STATE_RUNNABLE )
+            {
+                printf(" %d (state = %d)",from,pok_threads[from].state);
+            }
+            from++;
+        }
+        printf(" are NOT runnable;\n");
+
+    }
+#endif
+
+   return res;
+} /* POK_NEEDS_SCHED_WRR */
 
 #if defined (POK_NEEDS_LOCKOBJECTS) || defined (POK_NEEDS_PORTS_QUEUEING) || defined (POK_NEEDS_PORTS_SAMPLING)
 void pok_sched_unlock_thread (const uint32_t thread_id)

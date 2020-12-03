@@ -514,7 +514,7 @@ uint32_t pok_sched_part_priority (const uint32_t index_low, const uint32_t index
 
    from = prev_thread;
 
-   res= index_low;
+   res = index_low;
 
    uint8_t max_priority = -1;
    uint32_t max_priority_thread = IDLE_THREAD;
@@ -570,30 +570,32 @@ uint32_t pok_sched_part_priority (const uint32_t index_low, const uint32_t index
 
 uint32_t pok_sched_part_edf (const uint32_t index_low, const uint32_t index_high,const uint32_t __attribute__((unused)) prev_thread,const uint32_t __attribute__((unused)) current_thread)
 {
-   // TODO
    uint32_t res;
-#ifdef POK_NEEDS_DEBUG
    uint32_t from;
-   from = prev_thread;
-#endif
 
-   res= index_low;
+   from = prev_thread;
+
+   res = index_low;
+
+   uint64_t earliest_deadline = ULLONG_MAX;
+   uint32_t earliest_deadline_thread = IDLE_THREAD;
 
    do
    {
-      res++;
       if (res >= index_high)
       {
          res = index_low;
       }
-   }
-   while ((res != index_low) &&
-	  (pok_threads[res].state != POK_STATE_RUNNABLE));
 
-   if ((res == index_low) && (pok_threads[res].state != POK_STATE_RUNNABLE))
-   {
-      res = IDLE_THREAD;
+      if (pok_threads[res].deadline < earliest_deadline && pok_threads[res].state == POK_STATE_RUNNABLE)
+      {
+         earliest_deadline = pok_threads[res].deadline;
+         earliest_deadline_thread = res;
+      }
+
+      res++;
    }
+   while (res != index_low);
 
 #ifdef POK_NEEDS_DEBUG
     if ( res!= IDLE_THREAD)
@@ -624,7 +626,7 @@ uint32_t pok_sched_part_edf (const uint32_t index_low, const uint32_t index_high
     }
 #endif
 
-   return res;
+   return earliest_deadline_thread;
 }/* POK_NEEDS_SCHED_EDF */
 
 uint32_t pok_sched_part_wrr (const uint32_t index_low, const uint32_t index_high,const uint32_t __attribute__((unused)) prev_thread,const uint32_t __attribute__((unused)) current_thread)

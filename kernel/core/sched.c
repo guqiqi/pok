@@ -220,11 +220,12 @@ uint32_t	pok_elect_thread(uint8_t new_partition_id)
        thread->state = POK_STATE_RUNNABLE;
      }
 #endif
-
+      // 等待被执行，且到了激活时间，则认为此线程可被执行
      if ((thread->state == POK_STATE_WAIT_NEXT_ACTIVATION) && (thread->next_activation <= now))
      {
        thread->state = POK_STATE_RUNNABLE;
        thread->remaining_time_capacity =  thread->time_capacity;
+       // 确定下一个activation time
        thread->next_activation = thread->next_activation + thread->period; 
      }
    }
@@ -469,6 +470,7 @@ uint32_t pok_sched_part_rr (const uint32_t index_low, const uint32_t index_high,
    uint32_t res;
    uint32_t from;
 
+   // IDLE THREAD 是用来保存状态的，如果当前执行的是这个线程，那么这时候前一个真正执行的现成是prev_thread
    if (current_thread == IDLE_THREAD)
    {
       res = prev_thread;
@@ -480,11 +482,13 @@ uint32_t pok_sched_part_rr (const uint32_t index_low, const uint32_t index_high,
 
    from = res;
 
+   // 当前执行thread的时间片还没结束，并且还没执行完，则继续执行这个thread
    if ((pok_threads[current_thread].remaining_time_capacity > 0) && (pok_threads[current_thread].state == POK_STATE_RUNNABLE))
    {
       return current_thread;
    }
 
+   // 当前thread执行完成，寻找下一个可以执行的线程
    do
    {
       res++;
@@ -495,6 +499,7 @@ uint32_t pok_sched_part_rr (const uint32_t index_low, const uint32_t index_high,
    }
    while ((res != from) && (pok_threads[res].state != POK_STATE_RUNNABLE));
 
+   // 条件？ 切换IDLE THREAD
    if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
    {
       res = IDLE_THREAD;

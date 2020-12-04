@@ -577,7 +577,7 @@ uint32_t pok_sched_part_edf (const uint32_t index_low, const uint32_t index_high
 
    res = index_low;
 
-   uint64_t earliest_deadline = ULLONG_MAX;
+   uint64_t earliest_deadline = 1000000;
    uint32_t earliest_deadline_thread = IDLE_THREAD;
 
    do

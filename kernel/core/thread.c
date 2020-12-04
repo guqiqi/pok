@@ -104,10 +104,12 @@ void pok_thread_init(void)
    pok_threads[KERNEL_THREAD].base_priority	   = pok_sched_get_priority_min(0);
    pok_threads[KERNEL_THREAD].state		   = POK_STATE_RUNNABLE;
    pok_threads[KERNEL_THREAD].next_activation = 0;
+   pok_threads[KERNEL_THREAD].arrive_time = 0;
 
    pok_threads[IDLE_THREAD].period                     = 0;
    pok_threads[IDLE_THREAD].deadline                   = 0;
    pok_threads[IDLE_THREAD].time_capacity              = 0;
+   pok_threads[IDLE_THREAD].arrive_time                = 0;
    pok_threads[IDLE_THREAD].next_activation            = 0;
    pok_threads[IDLE_THREAD].remaining_time_capacity    = 0;
    pok_threads[IDLE_THREAD].wakeup_time		          = 0;
@@ -126,6 +128,7 @@ void pok_thread_init(void)
       pok_threads[i].time_capacity              = 0;
       pok_threads[i].remaining_time_capacity    = 0;
       pok_threads[i].next_activation            = 0;
+      pok_threads[i].arrive_time                = 0;
       pok_threads[i].wakeup_time                = 0;
       pok_threads[i].state                      = POK_STATE_STOPPED;
 
@@ -197,6 +200,11 @@ pok_ret_t pok_partition_thread_create (uint32_t*                  thread_id,
    {
       pok_threads[id].remaining_time_capacity   = POK_THREAD_DEFAULT_TIME_CAPACITY;
       pok_threads[id].time_capacity             = POK_THREAD_DEFAULT_TIME_CAPACITY;
+   }
+
+   if (attr->arrive_time > 0)
+   {
+      pok_threads[id].arrive_time = attr->arrive_time;
    }
 
    if (attr->weight > 0)

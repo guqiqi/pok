@@ -65,6 +65,7 @@ typedef struct
 	 uint64_t     next_activation;
 	 uint64_t 	  weight;
 	 pok_state_t  state;
+	 uint64_t     arrive_time;
 	 uint64_t	end_time;
 	 uint64_t     wakeup_time;
 #ifdef POK_NEEDS_SCHED_HFPPS
@@ -73,8 +74,8 @@ typedef struct
 	 void			 *entry;
 	 uint8_t		 partition;
 	 uint32_t		 sp;
-	 uint32_t    init_stack_addr;
-  uint8_t	base_priority;
+	 uint32_t    	 init_stack_addr;
+  	 uint8_t		 base_priority;
 	 /* stack pointer
 		* FIXME: this is platform-dependent code, we have to handle that ! */
 } pok_thread_t;
@@ -86,6 +87,7 @@ typedef struct
 	 uint64_t     period;
 	 uint64_t     deadline;
 	 uint64_t     time_capacity;
+	 uint64_t     arrive_time;
 	 uint32_t     stack_size;
 	 uint64_t 	  weight; 			/* weight of the thread      */
 	 pok_state_t  state;

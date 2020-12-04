@@ -66,7 +66,7 @@ void pok_partition_setup_scheduler (const uint8_t pid)
             break;
 #endif
          case POK_SCHED_RR:
-            pok_partitions[pid].sched_func  = &pok_sched_part_rms;
+            pok_partitions[pid].sched_func  = &pok_sched_part_rr;
             break;
          case POK_SCHED_PRIORITY:
             pok_partitions[pid].sched_func  = &pok_sched_part_priority;
@@ -86,7 +86,7 @@ void pok_partition_setup_scheduler (const uint8_t pid)
             break;
       }
 #else
-      pok_partitions[pid].sched_func  = &pok_sched_part_priority;
+      pok_partitions[pid].sched_func  = &pok_sched_part_rr;
 #endif
 }
 
@@ -139,6 +139,8 @@ void pok_partition_setup_main_thread (const uint8_t pid)
    attr.deadline = 0;
    attr.period   = 0;
    attr.time_capacity = 0;
+   attr.arrive_time   = 0;
+   attr.weight        = 0;
 
    pok_partition_thread_create (&main_thread, &attr, pid);
    pok_partitions[pid].thread_main = main_thread;

@@ -10,7 +10,7 @@ ARCHIVE=$(shell pwd)/partitions.cpio
 PARTITIONS=pr1/pr1.elf pr2/pr2.elf
 KERNEL=kernel/kernel.lo
 
-all: build-regular
+all: clean build-regular
 
 build-regular: build-kernel partitions $(TARGET)
 

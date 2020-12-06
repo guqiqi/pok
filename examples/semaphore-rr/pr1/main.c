@@ -30,14 +30,14 @@ int main ()
   pok_ret_t ret;
   pok_thread_attr_t     tattr;
 
-  ret = pok_sem_create(&sid , 2, 10, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&sid , 0, 10, POK_SEMAPHORE_DISCIPLINE_FIFO);
   printf("[P1] pok_sem_create return=%d, mid=%d\n", ret, sid);
 
   tattr.priority = 1;
   tattr.arrive_time = 0;
-  tattr.time_capacity = 2;
-  tattr.deadline = 6;
-  tattr.period = 10;
+  tattr.time_capacity = 1;
+  tattr.deadline = 2;
+  tattr.period = 500000000;
   tattr.weight = 1;
   tattr.entry = pinger_job1;
 
@@ -46,22 +46,22 @@ int main ()
 
   tattr.priority = 3;
   tattr.arrive_time = 0;
-  tattr.time_capacity = 6;
+  tattr.time_capacity = 2;
   tattr.deadline = 11;
-  tattr.period = 12;
+  tattr.period = 500000000;
   tattr.weight = 2;
-  tattr.entry = pinger_job1;
+  tattr.entry = pinger_job2;
 
   ret = pok_thread_create(&tid , &tattr);
   printf("[P1] pok_thread_create (2) return=%d\n", ret);
 
   tattr.priority = 2;
   tattr.arrive_time = 0;
-  tattr.time_capacity = 3;
+  tattr.time_capacity = 1;
   tattr.deadline = 9;
-  tattr.period = 9;
+  tattr.period = 500000000;
   tattr.weight = 3;
-  tattr.entry = pinger_job1;
+  tattr.entry = pinger_job3;
 
   ret = pok_thread_create(&tid , &tattr);
   printf("[P1] pok_thread_create (3) return=%d\n", ret);

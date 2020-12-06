@@ -499,7 +499,7 @@ uint32_t pok_sched_part_rr (const uint32_t index_low, const uint32_t index_high,
    }
    while ((res != from) && (pok_threads[res].state != POK_STATE_RUNNABLE));
 
-   // 条件？ 切换IDLE THREAD
+   // all thread has been processed, 切换IDLE THREAD
    if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
    {
       res = IDLE_THREAD;

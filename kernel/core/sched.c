@@ -518,7 +518,7 @@ uint32_t pok_sched_part_priority (const uint32_t index_low, const uint32_t index
 
    res = index_low;
 
-   uint8_t max_priority = -1;
+   uint8_t max_priority = 0;
    uint32_t max_priority_thread = IDLE_THREAD;
 
    do

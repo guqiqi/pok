@@ -24,7 +24,6 @@
 #define POK_NEEDS_PARTITIONS   1
 #define POK_NEEDS_SCHED        1
 #define POK_NEEDS_TIME         1
-#define POK_NEEDS_DEBUG        1
 #define POK_NEEDS_CONSOLE      1
 #define POK_NEEDS_LOCKOBJECTS  1
 

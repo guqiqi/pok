@@ -510,9 +510,11 @@ uint32_t pok_sched_part_rr (const uint32_t index_low, const uint32_t index_high,
 uint32_t pok_sched_part_priority (const uint32_t index_low, const uint32_t index_high,const uint32_t __attribute__((unused)) prev_thread,const uint32_t __attribute__((unused)) current_thread)
 {
    uint32_t res;
+#ifdef POK_NEEDS_DEBUG
    uint32_t from;
 
    from = prev_thread;
+#endif
 
    res = index_low;
 
@@ -534,7 +536,7 @@ uint32_t pok_sched_part_priority (const uint32_t index_low, const uint32_t index
 
       res++;
    }
-   while (res != index_low);
+   while (res != index_high);
 
 #ifdef POK_NEEDS_DEBUG
     if ( res!= IDLE_THREAD)
@@ -571,9 +573,11 @@ uint32_t pok_sched_part_priority (const uint32_t index_low, const uint32_t index
 uint32_t pok_sched_part_edf (const uint32_t index_low, const uint32_t index_high,const uint32_t __attribute__((unused)) prev_thread,const uint32_t __attribute__((unused)) current_thread)
 {
    uint32_t res;
+#ifdef POK_NEEDS_DEBUG
    uint32_t from;
 
    from = prev_thread;
+#endif
 
    res = index_low;
 
@@ -595,7 +599,7 @@ uint32_t pok_sched_part_edf (const uint32_t index_low, const uint32_t index_high
 
       res++;
    }
-   while (res != index_low);
+   while (res != index_high);
 
 #ifdef POK_NEEDS_DEBUG
     if ( res!= IDLE_THREAD)

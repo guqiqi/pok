@@ -635,7 +635,7 @@ uint32_t pok_sched_part_edf (const uint32_t index_low, const uint32_t index_high
 
 uint32_t pok_sched_part_wrr (const uint32_t index_low, const uint32_t index_high,const uint32_t __attribute__((unused)) prev_thread,const uint32_t __attribute__((unused)) current_thread)
 {
-   // TODO
+   // TODO ry
    uint32_t res;
 #ifdef POK_NEEDS_DEBUG
    uint32_t from;
@@ -691,6 +691,11 @@ uint32_t pok_sched_part_wrr (const uint32_t index_low, const uint32_t index_high
 
    return res;
 } /* POK_NEEDS_SCHED_WRR */
+
+uint32_t pok_sched_part_mlfq(const uint32_t, const uint32_t, const uint32_t prev_thread, const uint32_t current_thread){
+   // TODO wl
+   return current_thread;
+}
 
 #if defined (POK_NEEDS_LOCKOBJECTS) || defined (POK_NEEDS_PORTS_QUEUEING) || defined (POK_NEEDS_PORTS_SAMPLING)
 void pok_sched_unlock_thread (const uint32_t thread_id)

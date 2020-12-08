@@ -10,3 +10,4 @@
 *.pid
 *.idea
 *.vscode
+doc/*

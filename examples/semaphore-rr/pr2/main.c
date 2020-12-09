@@ -28,6 +28,10 @@ int main ()
   pok_thread_attr_t     tattr;
 
   tattr.priority = 42;
+  tattr.time_capacity = 2;
+  tattr.deadline = 2;
+  tattr.period = 1000000000;
+  tattr.weight = 2;
   tattr.entry = pinger_job;
 
   ret = pok_thread_create(&tid , &tattr);

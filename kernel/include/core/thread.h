@@ -63,7 +63,7 @@ typedef struct
 	 uint64_t     time_capacity;
 	 uint64_t     remaining_time_capacity;
 	 uint64_t     next_activation;
-	 uint64_t 	  weight;
+	 int 	  weight;
 	 pok_state_t  state;
 	 uint64_t     arrive_time;
 	 uint64_t	end_time;
@@ -89,7 +89,7 @@ typedef struct
 	 uint64_t     time_capacity;
 	 uint64_t     arrive_time;
 	 uint32_t     stack_size;
-	 uint64_t 	  weight; 			/* weight of the thread      */
+	 int 	  weight; 			/* weight of the thread      */
 	 pok_state_t  state;
 } pok_thread_attr_t;
 /*

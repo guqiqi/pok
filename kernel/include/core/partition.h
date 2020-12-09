@@ -117,7 +117,7 @@ typedef struct
 
   uint32_t		lock_level;
 
-  uint64_t      current_weight;                /** If the partition is scheduled using WRR, cw is the current weight and is initialized with zero **/
+  int      current_weight;                /** If the partition is scheduled using WRR, cw is the current weight and is initialized with zero **/
 
   pok_start_condition_t	start_condition;
 } pok_partition_t;

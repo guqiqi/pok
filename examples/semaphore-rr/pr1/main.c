@@ -37,7 +37,7 @@ int main ()
   tattr.arrive_time = 0;
   tattr.time_capacity = 1;
   tattr.deadline = 2;
-  tattr.period = 500000000;
+  tattr.period = 1000000000;
   tattr.weight = 1;
   tattr.entry = pinger_job1;
 
@@ -46,10 +46,10 @@ int main ()
 
   tattr.priority = 3;
   tattr.arrive_time = 0;
-  tattr.time_capacity = 2;
+  tattr.time_capacity = 3;
   tattr.deadline = 11;
-  tattr.period = 500000000;
-  tattr.weight = 2;
+  tattr.period = 1000000000;
+  tattr.weight = 3;
   tattr.entry = pinger_job2;
 
   ret = pok_thread_create(&tid , &tattr);
@@ -57,10 +57,10 @@ int main ()
 
   tattr.priority = 2;
   tattr.arrive_time = 0;
-  tattr.time_capacity = 1;
+  tattr.time_capacity = 5;
   tattr.deadline = 9;
-  tattr.period = 500000000;
-  tattr.weight = 3;
+  tattr.period = 1000000000;
+  tattr.weight = 5;
   tattr.entry = pinger_job3;
 
   ret = pok_thread_create(&tid , &tattr);

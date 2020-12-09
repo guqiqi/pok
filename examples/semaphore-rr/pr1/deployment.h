@@ -22,9 +22,11 @@
 #define POK_NEEDS_THREADS 1
 
 #define POK_NEEDS_CONSOLE 1
+#define POK_NEEDS_DEBUG 1
 
 #define POK_NEEDS_SEMAPHORES 1
 
 #define POK_NEEDS_LIBC_STDLIB 1
+
 
 #endif

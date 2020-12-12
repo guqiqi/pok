@@ -44,6 +44,7 @@
 #include <core/error.h>
 
 
+
 int gcd_weight(uint32_t size)
 {
    int weight_set[size];
@@ -777,11 +778,37 @@ uint32_t pok_sched_part_mlfq(const uint32_t index_low, const uint32_t index_high
 {
 
    // TODO wl
-   uint32_t res;
    uint32_t from;
+   uint32_t res;
+   uint64_t now = POK_GETTICK();
+   uint8_t high_priority = pok_threads[index_low].priority;
+   //选出当前还没有结束的所有线程当中 最高的优先级
+   for (uint32_t i = index_low; i < index_high; i++)
+   {
+      if (high_priority < pok_threads[i].priority && pok_threads[i].deadline > now)
+      {
+         high_priority = pok_threads[i].priority;
+      }
+   }
+   //选出最高优先级的线程 降低优先级 并且返回其线程id （此处只需要找到第一个优先级最高且还没有执行完毕的线程返回，在此情况下最高优先级已经是rr了）
+   for (uint32_t i = index_low; i < index_high; i++)
+   {
+      if (high_priority == pok_threads[i].priority && pok_threads[i].deadline > now)
+      {
+         if (pok_threads[i].priority > pok_threads[i].base_priority)
+         {
+            return i;
+         }else{
+            pok_threads[i].priority = pok_threads[i].priority - 1;
+            return i;
+         }
+      }
+   }
+   
    
 
-   // IDLE THREAD 是用来保存状态的，如果当前执行的是这个线程，那么这时候前一个真正执行的现成是prev_thread
+
+   // IDLE THREAD 是用来保存状态的，如果当前执行的是这个线程，那么这时候前一个真正执行的线程是prev_thread
    if (current_thread == IDLE_THREAD)
    {
       res = prev_thread;
@@ -793,29 +820,31 @@ uint32_t pok_sched_part_mlfq(const uint32_t index_low, const uint32_t index_high
 
    from = res;
 
-   // 当前执行thread的时间片还没结束，并且还没执行完，则继续执行这个thread
-   if ((pok_threads[current_thread].remaining_time_capacity > 0) && (pok_threads[current_thread].state == POK_STATE_RUNNABLE))
-   {
-      return current_thread;
-   }
+   return from;//所有定义的变量都必须要使用到，这里强行使用一下
 
-   // 当前thread执行完成，寻找下一个可以执行的线程
-   do
-   {
-      res++;
-      if (res > index_high)
-      {
-         res = index_low;
-      }
-   } while ((res != from) && (pok_threads[res].state != POK_STATE_RUNNABLE));
+   // // 当前执行thread的时间片还没结束，并且还没执行完，则继续执行这个thread
+   // if ((pok_threads[current_thread].remaining_time_capacity > 0) && (pok_threads[current_thread].state == POK_STATE_RUNNABLE))
+   // {
+   //    return current_thread;
+   // }
 
-   // all thread has been processed, 切换IDLE THREAD
-   if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
-   {
-      res = IDLE_THREAD;
-   }
-   return res;
-   return current_thread;
+   //当前thread执行完成，寻找下一个可以执行的线程
+   // do
+   // {
+   //    res++;
+   //    if (res > index_high)
+   //    {
+   //       res = index_low;
+   //    }
+   // } while ((res != from) && (pok_threads[res].state != POK_STATE_RUNNABLE));
+
+   // // all thread has been processed, 切换IDLE THREAD
+   // if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
+   // {
+   //    res = IDLE_THREAD;
+   // }
+   // return res;
+   // return current_thread;
 }
 
 #if defined(POK_NEEDS_LOCKOBJECTS) || defined(POK_NEEDS_PORTS_QUEUEING) || defined(POK_NEEDS_PORTS_SAMPLING)

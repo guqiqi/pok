@@ -24,7 +24,7 @@ typedef enum
 		POK_ERRNO_EINVAL                =   1,
 
 		POK_ERRNO_UNAVAILABLE           =   2,
-		POK_ERRNO_PARAM									=   3,
+		POK_ERRNO_PARAM					=   3,
 		POK_ERRNO_TOOMANY               =   5,
 		POK_ERRNO_EPERM                 =   6,
 		POK_ERRNO_EXISTS                =   7,

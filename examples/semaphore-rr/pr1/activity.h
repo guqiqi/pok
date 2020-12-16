@@ -20,6 +20,7 @@
 void* pinger_job1 ();
 void* pinger_job2 ();
 void* pinger_job3 ();
-void* pinger_job_add ();
+void* pinger_job4 ();
+void* pinger_job5 ();
 
 #endif

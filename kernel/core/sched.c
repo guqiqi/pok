@@ -120,6 +120,8 @@ extern void pok_port_flush_partition(uint8_t);
 
 uint64_t pok_sched_slots[POK_CONFIG_SCHEDULING_NBSLOTS] = (uint64_t[])POK_CONFIG_SCHEDULING_SLOTS;
 uint8_t pok_sched_slots_allocation[POK_CONFIG_SCHEDULING_NBSLOTS] = (uint8_t[])POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION;
+uint8_t pok_config_slots_priority[POK_CONFIG_SCHEDULING_NBSLOTS] = (uint8_t[])POK_CONFIG_SCHEDULING_PRIORITY;
+uint8_t pok_config_partition_number = (uint8_t)POK_CONFIG_NB_PARTITIONS;
 
 pok_sched_t pok_global_sched;
 uint64_t pok_sched_next_deadline;
@@ -130,7 +132,6 @@ uint64_t pok_sched_next_flush;      // variable used to handle user defined
                                     // boundaries
 uint8_t pok_sched_current_slot = 0; /* Which slot are we executing at this time ?*/
 uint32_t current_thread = KERNEL_THREAD;
-// uint64_t used_current_weight = 0; // the current weight in wrr schedule
 
 void pok_sched_thread_switch(void);
 
@@ -166,6 +167,67 @@ void pok_sched_init(void)
 #endif
    }
 #endif
+#endif
+#ifdef POK_NEEDS_DEBUG
+      printf("pok_sched_slots_allocation (deployment): ");
+      for (slot = 0; slot < POK_CONFIG_SCHEDULING_NBSLOTS; slot++)
+      {
+         printf(" %d ", pok_sched_slots_allocation[slot]);
+      }
+      printf("\n");
+#endif
+   
+   uint8_t pok_partition_current_slot = 0;
+   uint8_t i = 0;
+   uint8_t temp = 0;
+   switch (POK_CONFIG_SCHEDULER){
+      case POK_PARTITION_RR:
+         for (slot = 0; slot < POK_CONFIG_SCHEDULING_NBSLOTS; slot++)
+         {
+            pok_sched_slots_allocation[slot] =  pok_partition_current_slot;
+            pok_partition_current_slot = (pok_partition_current_slot+1) % pok_config_partition_number;
+         }
+         break;
+      case POK_PARTITION_PRIORITY:
+         for (slot = 0; slot < POK_CONFIG_SCHEDULING_NBSLOTS; slot++)
+         {
+            pok_sched_slots_allocation[slot] =  pok_partition_current_slot;
+            pok_partition_current_slot = (pok_partition_current_slot+1) % pok_config_partition_number;
+         }
+         // sort partition index and time slots according to the priority
+         for (slot = 0; slot < POK_CONFIG_SCHEDULING_NBSLOTS-1; slot++)
+         {
+            for (i =0; i < POK_CONFIG_SCHEDULING_NBSLOTS - slot -1; i++){
+               if( pok_config_slots_priority[i] >pok_config_slots_priority [i+1] )
+               {
+                  temp = pok_config_slots_priority[i+1];
+                  pok_config_slots_priority[i+1] = pok_config_slots_priority[i];
+                  pok_config_slots_priority[i] = temp;
+                  temp = pok_sched_slots_allocation[i+1];
+                  pok_sched_slots_allocation[i+1] =pok_sched_slots_allocation[i];
+                  pok_sched_slots_allocation[i] = temp;
+                  temp = pok_sched_slots[i+1];
+                  pok_sched_slots[i+1] = pok_sched_slots[i];
+                  pok_sched_slots[i] = temp;
+               }
+            }
+         }
+         break;
+      default:
+         for (slot = 0; slot < POK_CONFIG_SCHEDULING_NBSLOTS; slot++)
+         {
+            pok_sched_slots_allocation[slot] =  pok_partition_current_slot;
+            pok_partition_current_slot = (pok_partition_current_slot+1) % pok_config_partition_number;
+         }
+         break;         
+   }
+#ifdef POK_NEEDS_DEBUG
+      printf("pok_sched_slots_allocation (setting): ");
+      for (slot = 0; slot < POK_CONFIG_SCHEDULING_NBSLOTS; slot++)
+      {
+         printf(" %d ", pok_sched_slots_allocation[slot]);
+      }
+      printf("\n");
 #endif
 
    pok_sched_current_slot = 0;

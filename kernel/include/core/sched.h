@@ -22,6 +22,7 @@
 #include <types.h>
 #include <errno.h>
 #include <core/schedvalues.h>
+#include <core/partitionvalues.h>
 
 #ifdef POK_NEEDS_PARTITIONS
 extern uint8_t pok_current_partition;

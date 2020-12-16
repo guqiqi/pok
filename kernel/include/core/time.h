@@ -26,7 +26,7 @@
 /**
  * The rate of the clock in POK
  */
-#define POK_TIMER_FREQUENCY 100000
+#define POK_TIMER_FREQUENCY 1000
 
 /**
  * POK timer quantum

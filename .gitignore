@@ -11,4 +11,4 @@
 *.idea
 *.vscode
 doc/*
-examples/semaphores/sizes.c
+*.sizes.c

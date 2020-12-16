@@ -30,16 +30,14 @@
  * thread is used to execute kernel code while the idle thread
  * is used to save processor resources.
  */
+extern uint32_t                 num_total_thread;
+extern uint32_t 				KERNEL_THREAD;
+extern uint32_t					IDLE_THREAD;
 
-#define KERNEL_THREAD		POK_CONFIG_NB_THREADS -2
-#define IDLE_THREAD        POK_CONFIG_NB_THREADS -1
+// #define KERNEL_THREAD		num_total_thread +1
+// #define IDLE_THREAD        num_total_thread
 
 #define POK_THREAD_DEFAULT_TIME_CAPACITY 10
-
-/*
-#define KERNEL_THREAD		POK_CONFIG_NB_THREADS
-#define IDLE_THREAD        POK_CONFIG_NB_THREADS + 1
-*/
 
 #define POK_THREAD_MAX_PRIORITY  200
 
@@ -116,7 +114,9 @@ pok_ret_t		pok_partition_thread_create (uint32_t* thread_id,
 																						const uint8_t  partition_id);
 #endif
 
-extern pok_thread_t              pok_threads[POK_CONFIG_NB_THREADS];
+pok_ret_t 		pok_partition_thread_add(uint32_t* thread_id, const pok_thread_attr_t* attr, const uint8_t  partition_id);
+
+extern pok_thread_t              pok_threads[POK_CONFIG_NB_THREADS * 3];
 
 #define POK_CURRENT_THREAD pok_threads[POK_SCHED_CURRENT_THREAD]
 

@@ -129,7 +129,7 @@ uint64_t pok_sched_next_flush;      // variable used to handle user defined
                                     // MAF and from partition slot
                                     // boundaries
 uint8_t pok_sched_current_slot = 0; /* Which slot are we executing at this time ?*/
-uint32_t current_thread = KERNEL_THREAD;
+uint32_t current_thread;
 // uint64_t used_current_weight = 0; // the current weight in wrr schedule
 
 void pok_sched_thread_switch(void);
@@ -148,6 +148,8 @@ void pok_sched_init(void)
     */
    uint64_t total_time;
    uint8_t slot;
+
+   current_thread = KERNEL_THREAD;
 
    total_time = 0;
 
@@ -254,8 +256,8 @@ uint8_t pok_elect_partition()
 uint32_t pok_elect_thread(uint8_t new_partition_id)
 {
    uint64_t now = POK_GETTICK();
-   pok_partition_t *new_partition = &(pok_partitions[new_partition_id]);
 
+   pok_partition_t *new_partition = &(pok_partitions[new_partition_id]);
    /*
     * We unlock all WAITING threads if the waiting time is passed
     */
@@ -283,7 +285,6 @@ uint32_t pok_elect_thread(uint8_t new_partition_id)
          thread->next_activation = thread->next_activation + thread->period;
       }
    }
-
    /*
     * We elect the thread to be executed.
     */
@@ -391,7 +392,11 @@ void pok_sched()
    {
 
       elected_partition = pok_elect_partition();
+      
+// printf("elected -------- %d--- %d\n", elected_partition, pok_partitions[elected_partition].current_thread);
       elected_thread = pok_elect_thread(elected_partition);
+
+// printf("elected thread-------- %d\n", elected_thread);
    }
 
    pok_current_partition = elected_partition;
@@ -413,7 +418,7 @@ void pok_sched_thread_switch()
    uint32_t elected;
 
    now = POK_GETTICK();
-   for (i = 0; i <= POK_CONFIG_NB_THREADS; ++i)
+   for (i = 0; i <= num_total_thread; ++i)
    {
       if ((pok_threads[i].state == POK_STATE_WAITING) &&
           (pok_threads[i].wakeup_time <= now))
@@ -422,7 +427,7 @@ void pok_sched_thread_switch()
       }
    }
 
-   elected = pok_sched_part_election(0, POK_CONFIG_NB_THREADS);
+   elected = pok_sched_part_election(0, num_total_thread);
    /*
     *  FIXME : current debug session about exceptions-handled
    printf ("switch to thread %d\n", elected);
@@ -520,7 +525,15 @@ uint32_t pok_sched_part_rms(const uint32_t index_low, const uint32_t index_high,
 
 uint32_t pok_sched_part_rr(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
-   printf("pok sched part wrr");
+   // #ifdef POK_NEEDS_DEBUG
+   //    printf("-------\n");
+   //    for(int j = 0; j < num_total_thread; j++){
+   //       printf("%d %d %d\n", j, pok_threads[j].remaining_time_capacity, pok_threads[j].state);
+   //    }
+   //    printf("-------\n");
+   //    printf("--%d--%d---\n", current_thread, prev_thread);
+   // #endif
+   
    uint32_t res;
    uint32_t from;
 
@@ -557,6 +570,8 @@ uint32_t pok_sched_part_rr(const uint32_t index_low, const uint32_t index_high, 
    {
       res = IDLE_THREAD;
    }
+   
+   // printf("elect: %d-------\n", res);
    return res;
 }
 

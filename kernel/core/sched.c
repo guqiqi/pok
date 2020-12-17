@@ -521,7 +521,7 @@ uint32_t pok_sched_part_rms(const uint32_t index_low, const uint32_t index_high,
 
 uint32_t pok_sched_part_rr(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
-   printf("pok sched part wrr");
+   printf("pok sched part wrr\n");
    uint32_t res;
    uint32_t from;
 
@@ -594,28 +594,28 @@ uint32_t pok_sched_part_priority(const uint32_t index_low, const uint32_t index_
 #ifdef POK_NEEDS_DEBUG
    if (res != IDLE_THREAD)
    {
-      printf("--- scheduling thread: %d {%d} --- ", res,
-             pok_threads[res].period);
+      //printf("--- scheduling thread: %d {%d} --- ", res,
+             //pok_threads[res].period);
       from = index_low;
       while (from <= index_high)
       {
          if (pok_threads[from].state == POK_STATE_RUNNABLE)
          {
-            printf(" %d {%d} ,", from, pok_threads[from].period);
+            //printf(" %d {%d} ,", from, pok_threads[from].period);
          }
          from++;
       }
-      printf(" are runnable; \n\t\t");
+      //printf(" are runnable; \n\t\t");
       from = index_low;
       while (from <= index_high)
       {
          if (pok_threads[from].state != POK_STATE_RUNNABLE)
          {
-            printf(" %d (state = %d)", from, pok_threads[from].state);
+            //printf(" %d (state = %d)", from, pok_threads[from].state);
          }
          from++;
       }
-      printf(" are NOT runnable;\n");
+      //printf(" are NOT runnable;\n");
    }
 #endif
 
@@ -655,28 +655,28 @@ uint32_t pok_sched_part_edf(const uint32_t index_low, const uint32_t index_high,
 #ifdef POK_NEEDS_DEBUG
    if (res != IDLE_THREAD)
    {
-      printf("--- scheduling thread: %d {%d} --- ", res,
-             pok_threads[res].period);
+      //printf("--- scheduling thread: %d {%d} --- ", res,
+            // pok_threads[res].period);
       from = index_low;
       while (from <= index_high)
       {
          if (pok_threads[from].state == POK_STATE_RUNNABLE)
          {
-            printf(" %d {%d} ,", from, pok_threads[from].period);
+            //printf(" %d {%d} ,", from, pok_threads[from].period);
          }
          from++;
       }
-      printf(" are runnable; \n\t\t");
+      //printf(" are runnable; \n\t\t");
       from = index_low;
       while (from <= index_high)
       {
          if (pok_threads[from].state != POK_STATE_RUNNABLE)
          {
-            printf(" %d (state = %d)", from, pok_threads[from].state);
+            //printf(" %d (state = %d)", from, pok_threads[from].state);
          }
          from++;
       }
-      printf(" are NOT runnable;\n");
+      //printf(" are NOT runnable;\n");
    }
 #endif
 
@@ -777,38 +777,17 @@ uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high,
 uint32_t pok_sched_part_mlfq(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
 
-   // TODO wl
-   uint32_t from;
+printf("pok sched part mlfq!\n");
+   // TODO mlfq 目的是从index_low -- index_high 当中选择一个优先级最高的且还没有执行完毕的线程 返回其线程id
    uint32_t res;
-   uint64_t now = POK_GETTICK();
+   uint32_t from;
+   //now表示当前的时间片 目的是排除已经超过ddl的线程
+   uint64_t now = POK_GETTICK(); 
+   //初始 先假设第一个线程的优先级是最高的
    uint8_t high_priority = pok_threads[index_low].priority;
-   //选出当前还没有结束的所有线程当中 最高的优先级
-   for (uint32_t i = index_low; i < index_high; i++)
-   {
-      if (high_priority < pok_threads[i].priority && pok_threads[i].deadline > now)
-      {
-         high_priority = pok_threads[i].priority;
-      }
-   }
-   //选出最高优先级的线程 降低优先级 并且返回其线程id （此处只需要找到第一个优先级最高且还没有执行完毕的线程返回，在此情况下最高优先级已经是rr了）
-   for (uint32_t i = index_low; i < index_high; i++)
-   {
-      if (high_priority == pok_threads[i].priority && pok_threads[i].deadline > now)
-      {
-         if (pok_threads[i].priority > pok_threads[i].base_priority)
-         {
-            return i;
-         }else{
-            pok_threads[i].priority = pok_threads[i].priority - 1;
-            return i;
-         }
-      }
-   }
-   
-   
 
 
-   // IDLE THREAD 是用来保存状态的，如果当前执行的是这个线程，那么这时候前一个真正执行的线程是prev_thread
+   // IDLE THREAD 是用来保存状态的，如果当前执行的是这个线程，那么这时候前一个真正执行的现成是prev_thread
    if (current_thread == IDLE_THREAD)
    {
       res = prev_thread;
@@ -820,31 +799,51 @@ uint32_t pok_sched_part_mlfq(const uint32_t index_low, const uint32_t index_high
 
    from = res;
 
-   return from;//所有定义的变量都必须要使用到，这里强行使用一下
 
-   // // 当前执行thread的时间片还没结束，并且还没执行完，则继续执行这个thread
-   // if ((pok_threads[current_thread].remaining_time_capacity > 0) && (pok_threads[current_thread].state == POK_STATE_RUNNABLE))
-   // {
-   //    return current_thread;
-   // }
 
-   //当前thread执行完成，寻找下一个可以执行的线程
-   // do
-   // {
-   //    res++;
-   //    if (res > index_high)
-   //    {
-   //       res = index_low;
-   //    }
-   // } while ((res != from) && (pok_threads[res].state != POK_STATE_RUNNABLE));
+   //选出当前还没有结束的所有线程当中 最高的优先级
+   for (uint32_t i = index_low; i < index_high; i++)
+   {
+      if (high_priority < pok_threads[i].priority && pok_threads[i].deadline > now)
+      {
+         high_priority = pok_threads[i].priority;
+      }
+   }
 
-   // // all thread has been processed, 切换IDLE THREAD
-   // if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
-   // {
-   //    res = IDLE_THREAD;
-   // }
-   // return res;
-   // return current_thread;
+
+   //选出最高优先级的线程 降低优先级 并且返回其线程id （此处只需要找到第一个优先级最高且还没有执行完毕的线程返回，在此情况下最高优先级已经是rr了）
+   for (uint32_t i = res; i <= index_high; i++)
+   {
+      if (high_priority == pok_threads[i].priority && pok_threads[i].deadline > now)
+      {
+         if (pok_threads[i].priority > pok_threads[i].base_priority)
+         {
+            //如果 线程 的优先级已经是base了 那就不用再降低优先级了 直接返回结果
+            printf("Thread id = %d is running!\n", i);
+            return i;
+            
+         }else{
+            //如果线程的优先级还没有到达base 那就直接 优先级降低一级
+            pok_threads[i].priority = pok_threads[i].priority - 1;
+            printf("Thread id = %d is running!\n", i);
+            return i;
+         }
+      }
+   }
+   if (res > index_high)
+   {
+         res = index_low;
+    }
+
+   
+   // all thread has been processed, 切换IDLE THREAD
+   if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
+   {
+      res = IDLE_THREAD;
+      printf("IDLE thread is running!\n");
+   }
+   return res;
+
 }
 
 #if defined(POK_NEEDS_LOCKOBJECTS) || defined(POK_NEEDS_PORTS_QUEUEING) || defined(POK_NEEDS_PORTS_SAMPLING)

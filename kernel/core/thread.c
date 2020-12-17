@@ -108,10 +108,6 @@ void pok_thread_init(void)
 #endif
 #endif
 
-#ifdef POK_NEEDS_DEBUG
-   printf("total = %d %d %d", num_total_thread, KERNEL_THREAD, IDLE_THREAD);
-#endif
-
    pok_threads[KERNEL_THREAD].priority	   = pok_sched_get_priority_min(0);
    pok_threads[KERNEL_THREAD].base_priority	   = pok_sched_get_priority_min(0);
    pok_threads[KERNEL_THREAD].state		   = POK_STATE_RUNNABLE;

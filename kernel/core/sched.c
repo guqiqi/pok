@@ -284,6 +284,10 @@ uint32_t pok_elect_thread(uint8_t new_partition_id)
          // 确定下一个activation time
          thread->next_activation = thread->next_activation + thread->period;
       }
+
+      if(thread->remaining_time_capacity == 0 && thread->time_capacity > 0){
+         thread->state = POK_STATE_WAIT_NEXT_ACTIVATION;
+      }
    }
    /*
     * We elect the thread to be executed.
@@ -339,6 +343,8 @@ uint32_t pok_elect_thread(uint8_t new_partition_id)
                                           new_partition->thread_index_high,
                                           new_partition->prev_thread,
                                           new_partition->current_thread);
+      // printf("%d-------", elected);
+      // printf("current thread: %d, remaining time capacity: %d, elect thread id: %d, elected thread state: %d\n", POK_SCHED_CURRENT_THREAD, POK_CURRENT_THREAD.remaining_time_capacity, pok_threads[elected].state);
 #ifdef POK_NEEDS_INSTRUMENTATION
       if ((elected != IDLE_THREAD) && (elected != new_partition->thread_main))
       {
@@ -390,13 +396,8 @@ void pok_sched()
    else /* overmegadirty */
 #endif  /* POK_NEEDS_SCHED_HFPPS */
    {
-
       elected_partition = pok_elect_partition();
-      
-// printf("elected -------- %d--- %d\n", elected_partition, pok_partitions[elected_partition].current_thread);
       elected_thread = pok_elect_thread(elected_partition);
-
-// printf("elected thread-------- %d\n", elected_thread);
    }
 
    pok_current_partition = elected_partition;
@@ -524,16 +525,7 @@ uint32_t pok_sched_part_rms(const uint32_t index_low, const uint32_t index_high,
 #endif /* POK_NEEDS_SCHED_RMS */
 
 uint32_t pok_sched_part_rr(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
-{
-   // #ifdef POK_NEEDS_DEBUG
-   //    printf("-------\n");
-   //    for(int j = 0; j < num_total_thread; j++){
-   //       printf("%d %d %d\n", j, pok_threads[j].remaining_time_capacity, pok_threads[j].state);
-   //    }
-   //    printf("-------\n");
-   //    printf("--%d--%d---\n", current_thread, prev_thread);
-   // #endif
-   
+{   
    uint32_t res;
    uint32_t from;
 

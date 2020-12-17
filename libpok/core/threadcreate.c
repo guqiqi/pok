@@ -29,3 +29,10 @@ pok_ret_t pok_thread_create (uint32_t* thread_id, const pok_thread_attr_t* attr)
                          (uint32_t)attr);
 }
 #endif
+
+pok_ret_t 		pok_partition_thread_add(uint32_t* thread_id, const pok_thread_attr_t* attr)
+{
+   return pok_syscall2  (POK_SYSCALL_THREAD_ADD,
+                         (uint32_t)thread_id,
+                         (uint32_t)attr);
+}

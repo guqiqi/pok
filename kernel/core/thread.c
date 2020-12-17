@@ -41,7 +41,11 @@
  *    - one for the kernel thread (this code)
  *    - one for the idle task
  */
-pok_thread_t		         pok_threads[POK_CONFIG_NB_THREADS];
+pok_thread_t		         pok_threads[POK_CONFIG_NB_THREADS * 3];
+
+uint32_t                   num_total_thread = 0;
+uint32_t                   KERNEL_THREAD = POK_CONFIG_NB_THREADS-2;
+uint32_t                   IDLE_THREAD = POK_CONFIG_NB_THREADS-1;
 
 extern pok_partition_t     pok_partitions[POK_CONFIG_NB_PARTITIONS];
 
@@ -75,6 +79,9 @@ void pok_thread_insert_sort(uint16_t index_low, uint16_t index_high)
 void pok_thread_init(void)
 {
    uint32_t i;
+#ifdef POK_NEEDS_DEBUG
+   printf("%d %d %d", num_total_thread, KERNEL_THREAD, IDLE_THREAD);
+#endif
 
 #ifdef POK_NEEDS_PARTITIONS
    uint32_t total_threads;
@@ -85,6 +92,7 @@ void pok_thread_init(void)
    for (j = 0 ; j < POK_CONFIG_NB_PARTITIONS ; j++)
    {
       total_threads = total_threads + pok_partitions[j].nthreads;
+      num_total_thread = num_total_thread + pok_partitions[j].nthreads;
    }
 
 #if defined (POK_NEEDS_DEBUG) || defined (POK_NEEDS_ERROR_HANDLING)
@@ -245,6 +253,129 @@ pok_ret_t pok_partition_thread_create (uint32_t*                  thread_id,
    return POK_ERRNO_OK;
 }
 #endif
+
+pok_ret_t 		pok_partition_thread_add(uint32_t* thread_id, const pok_thread_attr_t* attr, const uint8_t  partition_id){
+  
+   uint32_t stack_vaddr;
+   
+   // calculate the new added thread id
+   uint32_t new_thread_id = pok_partitions[partition_id].thread_index_low + pok_partitions[partition_id].thread_index;
+ #if defined (POK_NEEDS_DEBUG)
+   #endif
+   pok_partitions[partition_id].thread_index =  pok_partitions[partition_id].thread_index + 1;
+   uint8_t  j;
+
+   // move the thread of the later partition behind one 
+   for (j = num_total_thread + 1; j >= new_thread_id; j--){
+      pok_threads[j + 1].priority = pok_threads[j].priority;
+	   pok_threads[j + 1].period = pok_threads[j].period;
+	   pok_threads[j + 1].deadline = pok_threads[j].deadline;
+	   pok_threads[j + 1].time_capacity = pok_threads[j].time_capacity;
+	   pok_threads[j + 1].remaining_time_capacity = pok_threads[j].remaining_time_capacity;
+	   pok_threads[j + 1].next_activation = pok_threads[j].next_activation;
+	   pok_threads[j + 1].weight = pok_threads[j].weight;
+	   pok_threads[j + 1].state = pok_threads[j].state;
+	   pok_threads[j + 1].arrive_time  = pok_threads[j].arrive_time;
+	   pok_threads[j + 1].end_time  = pok_threads[j].end_time;
+	   pok_threads[j + 1].wakeup_time  = pok_threads[j].wakeup_time;
+   #ifdef POK_NEEDS_SCHED_HFPPS
+	   pok_threads[j + 1].payback  = pok_threads[j].payback; /**< Payback for HFPPS scheduling algorithm */
+   #endif /* POK_NEEDS_SCHED_HFPPS */
+	   pok_threads[j + 1].entry = pok_threads[j].entry;
+	   pok_threads[j + 1].partition = pok_threads[j].partition;
+	   pok_threads[j + 1].sp = pok_threads[j].sp;
+	   pok_threads[j + 1].init_stack_addr = pok_threads[j].init_stack_addr;
+  	   pok_threads[j + 1].base_priority = pok_threads[j].base_priority;
+   }
+
+   // add a new thread of specific partition and move the thread behind
+   if ((attr->priority <= pok_sched_get_priority_max (pok_partitions[partition_id].sched)) && (attr->priority >= pok_sched_get_priority_min (pok_partitions[partition_id].sched)))
+   {
+      pok_threads[new_thread_id].priority      = attr->priority;
+      pok_threads[new_thread_id].base_priority      = attr->priority;
+   }
+
+   if (attr->period > 0)
+   {
+      pok_threads[new_thread_id].period          = attr->period;
+      pok_threads[new_thread_id].next_activation = attr->period;
+   }
+
+   if (attr->deadline > 0)
+   {
+      pok_threads[new_thread_id].deadline      = attr->deadline;
+   }
+
+#ifdef POK_NEEDS_SCHED_HFPPS
+   pok_threads[new_thread_id].payback = 0;
+#endif /* POK_NEEDS_SCHED_HFPPS */
+
+   if (attr->time_capacity > 0)
+   {
+      pok_threads[new_thread_id].time_capacity = attr->time_capacity;
+      pok_threads[new_thread_id].remaining_time_capacity = attr->time_capacity;
+   }
+   else
+   {
+      pok_threads[new_thread_id].remaining_time_capacity   = POK_THREAD_DEFAULT_TIME_CAPACITY;
+      pok_threads[new_thread_id].time_capacity             = POK_THREAD_DEFAULT_TIME_CAPACITY;
+   }
+
+   if (attr->arrive_time > 0)
+   {
+      pok_threads[new_thread_id].arrive_time = attr->arrive_time;
+   }
+
+   if (attr->weight > 0)
+   {
+      pok_threads[new_thread_id].weight = attr->weight;
+   }
+
+   stack_vaddr = pok_thread_stack_addr (partition_id, pok_partitions[partition_id].thread_index);
+
+   pok_threads[new_thread_id].state		   = POK_STATE_RUNNABLE;
+   pok_threads[new_thread_id].wakeup_time   = 0;
+   pok_threads[new_thread_id].sp		      = pok_space_context_create (partition_id,
+                                                             (uint32_t)attr->entry,
+                                                             stack_vaddr,
+                                                             0xdead,
+                                                             0xbeaf);
+   /*
+    *  FIXME : current debug session about exceptions-handled
+   printf ("thread sp=0x%x\n", pok_threads[id].sp);
+   printf ("thread stack vaddr=0x%x\n", stack_vaddr);
+   */
+   pok_threads[new_thread_id].partition        = partition_id; 
+   pok_threads[new_thread_id].entry            = attr->entry;
+   pok_threads[new_thread_id].init_stack_addr  = stack_vaddr;
+
+#ifdef POK_NEEDS_INSTRUMENTATION
+      pok_instrumentation_task_archi (new_thread_id);
+#endif
+
+   *thread_id = new_thread_id;
+
+   // add partition thread_index_high
+   pok_partitions[partition_id].thread_index_high = pok_partitions[partition_id].thread_index_high+1;
+   pok_partitions[partition_id].nthreads = pok_partitions[partition_id].nthreads+1;
+
+   //add total thread number
+   num_total_thread = num_total_thread + 1;
+   KERNEL_THREAD = KERNEL_THREAD+1;
+   IDLE_THREAD = IDLE_THREAD + 1;
+
+   // move partition_thread_index_low
+   for(j = partition_id + 1; j < POK_CONFIG_NB_PARTITIONS; j++){
+      pok_partitions[j].thread_index_low = pok_partitions[j].thread_index_low+1;
+      pok_partitions[j].thread_index_high = pok_partitions[j].thread_index_high+1;
+
+      pok_partitions[j].current_thread    = IDLE_THREAD;
+      pok_partitions[j].prev_thread       = IDLE_THREAD; 
+      pok_partitions[j].thread_main       = pok_partitions[j].thread_index_low;
+   }
+
+   return POK_ERRNO_OK;
+}
 
 
 /**

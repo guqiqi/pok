@@ -165,6 +165,20 @@ pok_ret_t pok_core_syscall (const pok_syscall_id_t       syscall_id,
                                              (pok_thread_attr_t*) (args->arg2 + infos->base_addr),
                                              (uint8_t)            infos->partition);
          break;
+      
+      case POK_SYSCALL_THREAD_ADD:
+         pok_check_ptr_or_return(infos->partition,
+                                 (void*)args->arg1,
+                                 sizeof(uint32_t));
+
+         pok_check_ptr_or_return(infos->partition,
+                                 (void*)args->arg2,
+                                 sizeof(pok_thread_attr_t));
+
+         return pok_partition_thread_add (   (uint32_t*)          (args->arg1 + infos->base_addr),
+                                             (pok_thread_attr_t*) (args->arg2 + infos->base_addr),
+                                             (uint8_t)            infos->partition);
+         break;
 
 #ifdef POK_NEEDS_THREAD_SLEEP
       case POK_SYSCALL_THREAD_SLEEP:

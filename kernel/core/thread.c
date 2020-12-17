@@ -79,9 +79,6 @@ void pok_thread_insert_sort(uint16_t index_low, uint16_t index_high)
 void pok_thread_init(void)
 {
    uint32_t i;
-#ifdef POK_NEEDS_DEBUG
-   printf("%d %d %d", num_total_thread, KERNEL_THREAD, IDLE_THREAD);
-#endif
 
 #ifdef POK_NEEDS_PARTITIONS
    uint32_t total_threads;

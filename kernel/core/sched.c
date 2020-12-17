@@ -631,11 +631,6 @@ uint32_t pok_sched_part_rr(const uint32_t index_low, const uint32_t index_high, 
 uint32_t pok_sched_part_priority(const uint32_t index_low, const uint32_t index_high, const uint32_t __attribute__((unused)) prev_thread, const uint32_t __attribute__((unused)) current_thread)
 {
    uint32_t res;
-#ifdef POK_NEEDS_DEBUG
-   uint32_t from;
-
-   from = prev_thread;
-#endif
 
    res = index_low;
 
@@ -658,45 +653,12 @@ uint32_t pok_sched_part_priority(const uint32_t index_low, const uint32_t index_
       res++;
    } while (res != index_high);
 
-#ifdef POK_NEEDS_DEBUG
-   if (res != IDLE_THREAD)
-   {
-      printf("--- scheduling thread: %d {%d} --- ", res,
-             pok_threads[res].period);
-      from = index_low;
-      while (from <= index_high)
-      {
-         if (pok_threads[from].state == POK_STATE_RUNNABLE)
-         {
-            printf(" %d {%d} ,", from, pok_threads[from].period);
-         }
-         from++;
-      }
-      printf(" are runnable; \n\t\t");
-      from = index_low;
-      while (from <= index_high)
-      {
-         if (pok_threads[from].state != POK_STATE_RUNNABLE)
-         {
-            printf(" %d (state = %d)", from, pok_threads[from].state);
-         }
-         from++;
-      }
-      printf(" are NOT runnable;\n");
-   }
-#endif
-
    return max_priority_thread;
 } /* POK_NEEDS_SCHED_PRIORITY */
 
 uint32_t pok_sched_part_edf(const uint32_t index_low, const uint32_t index_high, const uint32_t __attribute__((unused)) prev_thread, const uint32_t __attribute__((unused)) current_thread)
 {
    uint32_t res;
-#ifdef POK_NEEDS_DEBUG
-   uint32_t from;
-
-   from = prev_thread;
-#endif
 
    res = index_low;
 
@@ -718,34 +680,6 @@ uint32_t pok_sched_part_edf(const uint32_t index_low, const uint32_t index_high,
 
       res++;
    } while (res != index_high);
-
-#ifdef POK_NEEDS_DEBUG
-   if (res != IDLE_THREAD)
-   {
-      printf("--- scheduling thread: %d {%d} --- ", res,
-             pok_threads[res].period);
-      from = index_low;
-      while (from <= index_high)
-      {
-         if (pok_threads[from].state == POK_STATE_RUNNABLE)
-         {
-            printf(" %d {%d} ,", from, pok_threads[from].period);
-         }
-         from++;
-      }
-      printf(" are runnable; \n\t\t");
-      from = index_low;
-      while (from <= index_high)
-      {
-         if (pok_threads[from].state != POK_STATE_RUNNABLE)
-         {
-            printf(" %d (state = %d)", from, pok_threads[from].state);
-         }
-         from++;
-      }
-      printf(" are NOT runnable;\n");
-   }
-#endif
 
    return earliest_deadline_thread;
 } /* POK_NEEDS_SCHED_EDF */

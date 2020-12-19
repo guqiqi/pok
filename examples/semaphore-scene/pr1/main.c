@@ -30,44 +30,41 @@ int main ()
   pok_ret_t ret;
   pok_thread_attr_t     tattr;
 
-  ret = pok_sem_create(&sid , 0, 10, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&sid , 0, 2, POK_SEMAPHORE_DISCIPLINE_FIFO);
   printf("[P1] pok_sem_create return=%d, mid=%d\n", ret, sid);
 
-  tattr.priority = 1;
-  tattr.arrive_time = 0;
-  tattr.time_capacity = 2;
-  tattr.deadline = 2;
-  tattr.period = 500000000;
-  tattr.weight = 2;
+  tattr.priority = 3;
+  tattr.time_capacity = 3;
+  tattr.deadline = 800000000;
+  tattr.period = 1000000000;
+  tattr.weight = 3;
   tattr.entry = pinger_job1;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (1) return=%d\n", ret);
+  printf("[P1] pok_thread_create (Project A) return=%d\n", ret);
 
-  tattr.priority = 3;
-  tattr.arrive_time = 0;
+  tattr.priority = 2;
   tattr.time_capacity = 4;
-  tattr.deadline = 11;
-  tattr.period = 500000000;
-  tattr.weight = 4;
+  tattr.deadline = 600000000;
+  tattr.period = 1000000000;
+  tattr.weight = 2;
   tattr.entry = pinger_job2;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (2) return=%d\n", ret);
+  printf("[P1] pok_thread_create (Project B) return=%d\n", ret);
 
-  tattr.priority = 2;
-  tattr.arrive_time = 0;
-  tattr.time_capacity = 6;
-  tattr.deadline = 9;
+  tattr.priority = 5;
+  tattr.time_capacity = 1;
+  tattr.deadline = 200000000;
   tattr.period = 500000000;
-  tattr.weight = 6;
+  tattr.weight = 5;
   tattr.entry = pinger_job3;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (3) return=%d\n", ret);
+  printf("[P1] pok_thread_create (Meeting) return=%d\n", ret);
 
   pok_partition_set_mode (POK_PARTITION_MODE_NORMAL);
   pok_thread_wait_infinite ();
 
-   return (0);
+  return (0);
 }

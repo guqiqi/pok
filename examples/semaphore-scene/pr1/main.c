@@ -23,20 +23,23 @@
 #include "activity.h"
 
 uint8_t sid;
+uint8_t tid;
+uint8_t add_thread_num;
 
 int main ()
 {
-  uint8_t tid;
   pok_ret_t ret;
   pok_thread_attr_t     tattr;
+
+  add_thread_num = 0;
 
   ret = pok_sem_create(&sid , 0, 2, POK_SEMAPHORE_DISCIPLINE_FIFO);
   printf("[P1] pok_sem_create return=%d, mid=%d\n", ret, sid);
 
   tattr.priority = 3;
   tattr.time_capacity = 3;
-  tattr.deadline = 800000000;
-  tattr.period = 1000000000;
+  tattr.deadline = 8;
+  tattr.period = 100000000;
   tattr.weight = 3;
   tattr.entry = pinger_job1;
 
@@ -44,9 +47,9 @@ int main ()
   printf("[P1] pok_thread_create (Project A) return=%d\n", ret);
 
   tattr.priority = 2;
-  tattr.time_capacity = 4;
-  tattr.deadline = 600000000;
-  tattr.period = 1000000000;
+  tattr.time_capacity = 2;
+  tattr.deadline = 6;
+  tattr.period = 100000000;
   tattr.weight = 2;
   tattr.entry = pinger_job2;
 
@@ -55,8 +58,8 @@ int main ()
 
   tattr.priority = 5;
   tattr.time_capacity = 1;
-  tattr.deadline = 200000000;
-  tattr.period = 500000000;
+  tattr.deadline = 2;
+  tattr.period = 50000000;
   tattr.weight = 5;
   tattr.entry = pinger_job3;
 

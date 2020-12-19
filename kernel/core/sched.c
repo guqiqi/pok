@@ -394,6 +394,7 @@ uint32_t pok_elect_thread(uint8_t new_partition_id)
          if (POK_CURRENT_THREAD.remaining_time_capacity > 0)
          {
             POK_CURRENT_THREAD.remaining_time_capacity = POK_CURRENT_THREAD.remaining_time_capacity - 1;
+            printf("thread %d, remain time capacity %d\n", POK_SCHED_CURRENT_THREAD, POK_CURRENT_THREAD.remaining_time_capacity);
          }
          else if (POK_CURRENT_THREAD.time_capacity > 0) // Wait next activation only for thread
                                                         // with non-infinite capacity (could be
@@ -605,10 +606,10 @@ uint32_t pok_sched_part_rr(const uint32_t index_low, const uint32_t index_high, 
    from = res;
 
    // 当前执行thread的时间片还没结束，并且还没执行完，则继续执行这个thread
-   if ((pok_threads[current_thread].remaining_time_capacity > 0) && (pok_threads[current_thread].state == POK_STATE_RUNNABLE))
-   {
-      return current_thread;
-   }
+   // if ((pok_threads[current_thread].remaining_time_capacity > 0) && (pok_threads[current_thread].state == POK_STATE_RUNNABLE))
+   // {
+   //    return current_thread;
+   // }
 
    // 当前thread执行完成，寻找下一个可以执行的线程
    do

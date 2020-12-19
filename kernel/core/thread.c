@@ -326,6 +326,10 @@ pok_ret_t 		pok_partition_thread_add(uint32_t* thread_id, const pok_thread_attr_
    if (attr->weight > 0)
    {
       pok_threads[new_thread_id].weight = attr->weight;
+
+      if(attr->weight > pok_partitions[partition_id].current_weight){
+         pok_partitions[partition_id].current_weight = attr->weight;
+      }
    }
 
    stack_vaddr = pok_thread_stack_addr (partition_id, pok_partitions[partition_id].thread_index);

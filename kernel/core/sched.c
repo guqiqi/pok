@@ -776,49 +776,43 @@ uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high,
    return res;
 } /* POK_NEEDS_SCHED_WRR */
 
-uint32_t pok_sched_part_mlfq(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
+uint32_t myS = 0;
+uint32_t pok_sched_part_mlfq(const uint32_t index_low, const uint32_t index_high, const uint32_t __attribute__((unused)) prev_thread, const uint32_t __attribute__((unused)) current_thread)
 {
-
-   // TODO wl
+   myS++;
+   if(myS >= 50){
+      //重置优先级到最高
+      for(uint32_t i = index_low;i < index_high; i++){
+         pok_threads[i].priority = 3;
+      }
+      myS = 0;
+   }
    uint32_t res;
-   uint32_t from;
-   
 
-   // IDLE THREAD 是用来保存状态的，如果当前执行的是这个线程，那么这时候前一个真正执行的现成是prev_thread
-   if (current_thread == IDLE_THREAD)
-   {
-      res = prev_thread;
-   }
-   else
-   {
-      res = current_thread;
-   }
+   res = index_low;
 
-   from = res;
+   uint8_t max_priority = 0;
+   uint32_t max_priority_thread = IDLE_THREAD;
 
-   // 当前执行thread的时间片还没结束，并且还没执行完，则继续执行这个thread
-   if ((pok_threads[current_thread].remaining_time_capacity > 0) && (pok_threads[current_thread].state == POK_STATE_RUNNABLE))
-   {
-      return current_thread;
-   }
-
-   // 当前thread执行完成，寻找下一个可以执行的线程
    do
    {
-      res++;
-      if (res > index_high)
+      if (res >= index_high)
       {
          res = index_low;
       }
-   } while ((res != from) && (pok_threads[res].state != POK_STATE_RUNNABLE));
 
-   // all thread has been processed, 切换IDLE THREAD
-   if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
-   {
-      res = IDLE_THREAD;
+      if (pok_threads[res].priority > max_priority && pok_threads[res].state == POK_STATE_RUNNABLE)
+      {
+         max_priority = pok_threads[res].priority;
+         max_priority_thread = res;
+      }
+
+      res++;
+   } while (res != index_high);
+   if(pok_threads[max_priority_thread].priority > pok_threads[max_priority_thread].base_priority){
+      pok_threads[max_priority_thread].priority--;
    }
-   return res;
-   return current_thread;
+   return max_priority_thread;
 }
 
 #if defined(POK_NEEDS_LOCKOBJECTS) || defined(POK_NEEDS_PORTS_QUEUEING) || defined(POK_NEEDS_PORTS_SAMPLING)

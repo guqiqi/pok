@@ -36,7 +36,7 @@ int main ()
   tattr.entry = pinger_job1;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (1) return=%d\n", ret);
+  printf("[P2] pok_thread_create (1) return=%d\n", ret);
 
   tattr.priority = 3;
   tattr.arrive_time = 0;
@@ -47,9 +47,9 @@ int main ()
   tattr.entry = pinger_job2;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (2) return=%d\n", ret);
+  printf("[P2] pok_thread_create (2) return=%d\n", ret);
 
-  tattr.priority = 2;
+  tattr.priority = 3;
   tattr.arrive_time = 0;
   tattr.time_capacity = 6;
   tattr.deadline = 9;
@@ -58,7 +58,7 @@ int main ()
   tattr.entry = pinger_job3;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (3) return=%d\n", ret);
+  printf("[P2] pok_thread_create (3) return=%d\n", ret);
 
   pok_partition_set_mode (POK_PARTITION_MODE_NORMAL);
   pok_thread_wait_infinite ();

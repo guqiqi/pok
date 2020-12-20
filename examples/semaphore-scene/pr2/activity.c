@@ -17,32 +17,31 @@
 
 #include <libc/stdio.h>
 #include <core/thread.h>
+#define TIME_INTERVAL 10000000
+
 void* pinger_job1 ()
 {
-   pok_ret_t ret;
    while (1)
    {
-      printf ("P2T1\n");
-      pok_thread_sleep (10000);
+      printf ("P2 Eating\n");
+      pok_thread_sleep(10000);
    }
 }
 
 void* pinger_job2 ()
 {
-   pok_ret_t ret;
    while (1)
    {
-      printf ("P2T2\n");
-      pok_thread_sleep (10000);
+      printf ("P2 Entertainment\n");
+      pok_thread_sleep(10000);
    }
 }
 
 void* pinger_job3 ()
 {
-   pok_ret_t ret;
    while (1)
    {
-      printf ("P2T3\n");
-      pok_thread_sleep (10000);
+      printf ("P2 Housework\n");
+      pok_thread_sleep(10000);
    }
 }

@@ -57,19 +57,21 @@ void* pinger_job1 ()
          tattr.entry = pinger_job4;
 
          ret = pok_partition_thread_add(&tid , &tattr);
+         printf("[P1] pok_thread_create (Eating) return=%d\n", ret);
          
          add_thread_num = add_thread_num + 1;
       }
 
       if(add_thread_num == 0 && time_now > 30000000){
          tattr.priority = 4;
-         tattr.time_capacity = 2;
+         tattr.time_capacity = 1;
          tattr.deadline = 5;
          tattr.period = 150000000;
          tattr.weight = 4;
          tattr.entry = pinger_job5;
 
          ret = pok_partition_thread_add(&tid , &tattr);
+         printf("[P1] pok_thread_create (Project C) return=%d\n", ret);
          
          add_thread_num = add_thread_num + 1;
       }
@@ -78,6 +80,8 @@ void* pinger_job1 ()
       {
          ret = pok_time_gettick(&time_now);
       }
+
+      pok_thread_sleep (10);
    }
 }
 
@@ -108,19 +112,21 @@ void* pinger_job2 ()
          tattr.entry = pinger_job4;
 
          ret = pok_partition_thread_add(&tid , &tattr);
+         printf("[P1] pok_thread_create (Eating) return=%d\n", ret);
          
          add_thread_num = add_thread_num + 1;
       }
 
       if(add_thread_num == 0 && time_now > 30000000){
          tattr.priority = 4;
-         tattr.time_capacity = 2;
+         tattr.time_capacity = 1;
          tattr.deadline = 5;
          tattr.period = 150000000;
          tattr.weight = 4;
          tattr.entry = pinger_job5;
 
          ret = pok_partition_thread_add(&tid , &tattr);
+         printf("[P1] pok_thread_create (Project C) return=%d\n", ret);
          
          add_thread_num = add_thread_num + 1;
       }
@@ -129,6 +135,8 @@ void* pinger_job2 ()
       {
          ret = pok_time_gettick(&time_now);
       }
+
+      pok_thread_sleep (10);
    }
 }
 
@@ -145,8 +153,6 @@ void* pinger_job3 ()
       ret = pok_time_gettick(&time_start);
       ret = pok_time_gettick(&time_now);
 
-      printf ("P1 Meeting\n");
-
       if(add_thread_num == 1 && time_now > 40000000){
          tattr.priority = 5;
          tattr.time_capacity = 1;
@@ -156,19 +162,21 @@ void* pinger_job3 ()
          tattr.entry = pinger_job4;
 
          ret = pok_partition_thread_add(&tid , &tattr);
+         printf("[P1] pok_thread_create (Eating) return=%d\n", ret);
          
          add_thread_num = add_thread_num + 1;
       }
 
       if(add_thread_num == 0 && time_now > 30000000){
          tattr.priority = 4;
-         tattr.time_capacity = 2;
+         tattr.time_capacity = 1;
          tattr.deadline = 5;
          tattr.period = 150000000;
          tattr.weight = 4;
          tattr.entry = pinger_job5;
 
          ret = pok_partition_thread_add(&tid , &tattr);
+         printf("[P1] pok_thread_create (Project C) return=%d\n", ret);
          
          add_thread_num = add_thread_num + 1;
       }
@@ -177,6 +185,9 @@ void* pinger_job3 ()
       {
          ret = pok_time_gettick(&time_now);
       }
+      printf ("P1 Meeting\n");
+
+      pok_thread_sleep (10);
    }
 }
 
@@ -191,13 +202,15 @@ void* pinger_job4 ()
    {
       ret = pok_time_gettick(&time_start);
       ret = pok_time_gettick(&time_now);
-
-      printf ("P1 Eating\n");
-
+      
       while (time_now - time_start < TIME_INTERVAL)
       {
          ret = pok_time_gettick(&time_now);
       }
+
+      printf ("P1 Eating\n");
+
+      pok_thread_sleep (10);
    }
 }
 
@@ -220,5 +233,6 @@ void* pinger_job5 ()
       {
          ret = pok_time_gettick(&time_now);
       }
+      pok_thread_sleep (10);
    }
 }

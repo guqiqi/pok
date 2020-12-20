@@ -295,12 +295,12 @@ pok_ret_t 		pok_partition_thread_add(uint32_t* thread_id, const pok_thread_attr_
    if (attr->period > 0)
    {
       pok_threads[new_thread_id].period          = attr->period;
-      pok_threads[new_thread_id].next_activation = attr->period;
+      pok_threads[new_thread_id].next_activation = attr->period + POK_GETTICK();
    }
 
    if (attr->deadline > 0)
    {
-      pok_threads[new_thread_id].deadline      = attr->deadline;
+      pok_threads[new_thread_id].deadline      = attr->deadline + POK_GETTICK();
    }
 
 #ifdef POK_NEEDS_SCHED_HFPPS

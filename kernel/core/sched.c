@@ -344,6 +344,7 @@ uint32_t pok_elect_thread(uint8_t new_partition_id)
       {
          thread->state = POK_STATE_RUNNABLE;
          thread->remaining_time_capacity = thread->time_capacity;
+         thread->deadline = thread->deadline + thread->period;
          // 确定下一个activation time
          thread->next_activation = thread->next_activation + thread->period;
       }
@@ -394,7 +395,7 @@ uint32_t pok_elect_thread(uint8_t new_partition_id)
          if (POK_CURRENT_THREAD.remaining_time_capacity > 0)
          {
             POK_CURRENT_THREAD.remaining_time_capacity = POK_CURRENT_THREAD.remaining_time_capacity - 1;
-            printf("thread %d, remain time capacity %d\n", POK_SCHED_CURRENT_THREAD, POK_CURRENT_THREAD.remaining_time_capacity);
+            // printf("thread %d, remain time capacity %d\n", POK_SCHED_CURRENT_THREAD, POK_CURRENT_THREAD.remaining_time_capacity);
          }
          else if (POK_CURRENT_THREAD.time_capacity > 0) // Wait next activation only for thread
                                                         // with non-infinite capacity (could be
@@ -663,8 +664,12 @@ uint32_t pok_sched_part_edf(const uint32_t index_low, const uint32_t index_high,
 
    res = index_low;
 
-   uint64_t earliest_deadline = 1000000;
+   uint64_t earliest_deadline = 0xFFFFFFFFFFFFFFFF;
    uint32_t earliest_deadline_thread = IDLE_THREAD;
+
+   // for (uint32_t i = index_low + 1; i < index_high; i++){
+   //    printf("thread %d deadline %u\n", i, pok_threads[i].deadline);
+   // }
 
    do
    {

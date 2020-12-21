@@ -31,9 +31,9 @@ void* pinger_job1 ()
    while (1)
    {
       //printf ("P1T1: I will signal semaphores\n");
-      ret = pok_sem_signal (sid);
-      printf ("P1T1\n");
-      pok_thread_sleep (10000);
+      // ret = pok_sem_signal (sid);
+      // printf ("P1T1\n");
+      // pok_thread_sleep (10000);
    }
 }
 
@@ -43,9 +43,9 @@ void* pinger_job2 ()
    while (1)
    {
       //printf ("P1T2: I will signal semaphores\n");
-      ret = pok_sem_signal (sid);
-      printf ("P1T2\n");
-      pok_thread_sleep (10000);
+      // ret = pok_sem_signal (sid);
+      // printf ("P1T2\n");
+      // pok_thread_sleep (10000);
    }
 }
 
@@ -59,8 +59,8 @@ void* pinger_job3 ()
    while (1)
    {
       //printf ("P1T3: I will wait for the semaphores\n");
-      ret = pok_sem_wait (sid, 0);
-      printf ("P1T3\n");
+      // ret = pok_sem_wait (sid, 0);
+      // printf ("P1T3\n");
 
       // ret = pok_time_gettick(&time_t);
 
@@ -90,7 +90,7 @@ void* pinger_job3 ()
       //    add_task = add_task + 1;
       // }
 
-      pok_thread_sleep (10000);
+      // pok_thread_sleep (10000);
    }
 }
 

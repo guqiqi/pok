@@ -22,8 +22,8 @@ void* pinger_job1 ()
    pok_ret_t ret;
    while (1)
    {
-      printf ("P2T1\n");
-      pok_thread_sleep (10000);
+      // printf ("P2T1\n");
+      // pok_thread_sleep (10000);
    }
 }
 
@@ -32,8 +32,8 @@ void* pinger_job2 ()
    pok_ret_t ret;
    while (1)
    {
-      printf ("P2T2\n");
-      pok_thread_sleep (10000);
+      // printf ("P2T2\n");
+      // pok_thread_sleep (10000);
    }
 }
 
@@ -42,7 +42,7 @@ void* pinger_job3 ()
    pok_ret_t ret;
    while (1)
    {
-      printf ("P2T3\n");
-      pok_thread_sleep (10000);
+      // printf ("P2T3\n");
+      // pok_thread_sleep (10000);
    }
 }

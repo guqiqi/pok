@@ -23,8 +23,8 @@ void* pinger_job1 ()
 {
    while (1)
    {
-      printf ("P2 Eating\n");
-      pok_thread_sleep(10000);
+      // printf ("P2 Eating\n");
+      // pok_thread_sleep(10000);
    }
 }
 
@@ -32,8 +32,8 @@ void* pinger_job2 ()
 {
    while (1)
    {
-      printf ("P2 Entertainment\n");
-      pok_thread_sleep(10000);
+      // printf ("P2 Entertainment\n");
+      // pok_thread_sleep(10000);
    }
 }
 
@@ -41,7 +41,7 @@ void* pinger_job3 ()
 {
    while (1)
    {
-      printf ("P2 Housework\n");
-      pok_thread_sleep(10000);
+      // printf ("P2 Housework\n");
+      // pok_thread_sleep(10000);
    }
 }

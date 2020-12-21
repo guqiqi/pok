@@ -463,6 +463,9 @@ void pok_sched()
    {
       elected_partition = pok_elect_partition();
       elected_thread = pok_elect_thread(elected_partition);
+
+      if(elected_thread != IDLE_THREAD && elected_thread != pok_partitions[elected_partition].thread_index_low)
+         printf("P%dT%d, remaining time capacity: %d\n", elected_partition, elected_thread, pok_threads[elected_thread].remaining_time_capacity);
    }
 
    pok_current_partition = elected_partition;

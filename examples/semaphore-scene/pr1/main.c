@@ -44,7 +44,7 @@ int main ()
   tattr.entry = pinger_job1;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (Project A) return=%d\n", ret);
+  printf("[P1] pok_thread_create (Project A) thread id=%d\n", tid);
 
   tattr.priority = 2;
   tattr.time_capacity = 2;
@@ -54,7 +54,7 @@ int main ()
   tattr.entry = pinger_job2;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (Project B) return=%d\n", ret);
+  printf("[P1] pok_thread_create (Project B) thread id=%d\n", tid);
 
   tattr.priority = 5;
   tattr.time_capacity = 1;
@@ -64,8 +64,8 @@ int main ()
   tattr.entry = pinger_job3;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (Meeting) return=%d\n", ret);
-
+  printf("[P1] pok_thread_create (Meeting) thread id=%d\n", tid);
+  
   pok_partition_set_mode (POK_PARTITION_MODE_NORMAL);
   pok_thread_wait_infinite ();
 

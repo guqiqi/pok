@@ -780,40 +780,70 @@ uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high,
 uint32_t myS = 0;
 uint32_t pok_sched_part_mlfq(const uint32_t index_low, const uint32_t index_high, const uint32_t __attribute__((unused)) prev_thread, const uint32_t __attribute__((unused)) current_thread)
 {
-   myS++;
-   if(myS >= 50){
+   if(myS >= 5){
       //重置优先级到最高
-      for(uint32_t i = index_low;i < index_high; i++){
+      for (uint32_t i = index_low + 1; i < index_high; i++)
+      {
          pok_threads[i].priority = 3;
       }
       myS = 0;
+      printf("reset !!!!\n");
    }
-   uint32_t res;
+   myS++;
 
-   res = index_low;
+   uint32_t res = index_low + 1;
+   uint32_t from;
+   uint8_t high_priority = pok_threads[index_low + 1].priority;
+   uint32_t currExe = 0;
+   uint32_t len = index_high - index_low - 1;
+   
+   // IDLE THREAD 是用来保存状态的，如果当前执行的是这个线程，那么这时候前一个真正执行的现成是prev_thread
+   if (current_thread == IDLE_THREAD)
+   {
+      res = prev_thread;
+   }
+   else
+   {
+      res = current_thread;
+   }
 
-   uint8_t max_priority = 0;
-   uint32_t max_priority_thread = IDLE_THREAD;
+   from = res;
+   
+   //选出当前还没有结束的所有线程当中 最高的优先级
+   for (uint32_t i = index_low + 1; i < index_high; i++)
+   {
+      if (high_priority < pok_threads[i].priority)
+      {
+         high_priority = pok_threads[i].priority;
+      }
+   }
+   printf("high priority = %d\n",high_priority);
+   //寻找下一个可以执行的线程
 
+   
    do
    {
+      if(currExe >= len){
+         break;
+      }
+      currExe++;
+      res++;
       if (res >= index_high)
       {
-         res = index_low;
+         res = index_low + 1;
       }
+   } while (pok_threads[res].priority != high_priority);
 
-      if (pok_threads[res].priority > max_priority && pok_threads[res].state == POK_STATE_RUNNABLE)
-      {
-         max_priority = pok_threads[res].priority;
-         max_priority_thread = res;
+   // all thread has been processed, 切换IDLE THREAD
+   if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
+   {
+      res = IDLE_THREAD;
+   }else{
+      if(pok_threads[res].priority > 1){
+         pok_threads[res].priority--;
       }
-
-      res++;
-   } while (res != index_high);
-   if(pok_threads[max_priority_thread].priority > pok_threads[max_priority_thread].base_priority){
-      pok_threads[max_priority_thread].priority--;
    }
-   return max_priority_thread;
+   return res;
 }
 
 #if defined(POK_NEEDS_LOCKOBJECTS) || defined(POK_NEEDS_PORTS_QUEUEING) || defined(POK_NEEDS_PORTS_SAMPLING)

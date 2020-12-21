@@ -31,40 +31,40 @@ int main ()
   pok_thread_attr_t     tattr;
 
   ret = pok_sem_create(&sid , 0, 10, POK_SEMAPHORE_DISCIPLINE_FIFO);
-  printf("[P1] pok_sem_create return=%d, mid=%d\n", ret, sid);
+  printf("[P0] pok_sem_create return=%d, mid=%d\n", ret, sid);
 
   tattr.priority = 1;
   tattr.arrive_time = 0;
   tattr.time_capacity = 2;
-  tattr.deadline = 20000000;
+  tattr.deadline = 2;
   tattr.period = 500000000;
   tattr.weight = 2;
   tattr.entry = pinger_job1;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (1) thread id=%d\n", tid);
+  printf("[P0] pok_thread_create (1) thread id=%d\n", tid);
 
   tattr.priority = 3;
   tattr.arrive_time = 0;
   tattr.time_capacity = 4;
-  tattr.deadline = 110000000;
+  tattr.deadline = 11;
   tattr.period = 500000000;
   tattr.weight = 4;
   tattr.entry = pinger_job2;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (2) thread id=%d\n", tid);
+  printf("[P0] pok_thread_create (2) thread id=%d\n", tid);
 
   tattr.priority = 2;
   tattr.arrive_time = 0;
   tattr.time_capacity = 6;
-  tattr.deadline = 90000000;
+  tattr.deadline = 9;
   tattr.period = 500000000;
   tattr.weight = 6;
   tattr.entry = pinger_job3;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (3) thread id=%d\n", tid);
+  printf("[P0] pok_thread_create (3) thread id=%d\n", tid);
 
   pok_partition_set_mode (POK_PARTITION_MODE_NORMAL);
   pok_thread_wait_infinite ();

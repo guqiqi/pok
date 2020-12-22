@@ -32,7 +32,7 @@ int main ()
   tattr.time_capacity = 6;
   tattr.deadline = 20000000;
   tattr.period = 500000000;
-  tattr.weight = 4;
+  tattr.weight = 6;
   tattr.entry = pinger_job1;
 
   ret = pok_thread_create(&tid , &tattr);
@@ -43,7 +43,7 @@ int main ()
   tattr.time_capacity = 4;
   tattr.deadline = 110000000;
   tattr.period = 500000000;
-  tattr.weight = 3;
+  tattr.weight = 4;
   tattr.entry = pinger_job2;
 
   ret = pok_thread_create(&tid , &tattr);

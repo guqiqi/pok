@@ -42,61 +42,52 @@
 #include <core/debug.h>
 #include <core/instrumentation.h>
 #include <core/error.h>
-
-
-int gcd_weight(uint32_t size)
-{
-   int weight_set[size];
-   uint32_t i;
-   for (i = 0; i < size; i++)
-   {
-      weight_set[i]=pok_threads[i].weight;
+int gcd (int a, int b){
+   if (a == 0)
+      return b;
+   if (b == 0)
+      return a;
+   int mod = a % b;
+   while ( mod != 0){
+      a = b ;
+      b = mod ;
+      mod = a % b;
    }
+   return b;
+}
 
-   // return 1;
+int gcd_weight(uint32_t index_low, uint32_t index_high)
+{
+   uint32_t i;
+   int res = pok_threads[index_low].weight;
+   // for (i = index_low; i <= index_high; i++)
+   // {
+   //    //weight_set[i]=pok_threads[index_low+i].weight;
+   //    printf(" %d ",pok_threads[i].weight);
+   // }
+   // printf("\n");
+
    // get the greatest common dividor of weight set
-   int res = 0;
-   int j = 1;
-   int k = 2;
-   for (i = 2; i < size; i++)
+
+   for (i = index_low+1 ; i < index_high; i++)
    {
-      j = weight_set[i-1];
-      k = weight_set[i];
-      if (j == 0)
-         return k;
-      else if (k == 0)
-         return j;
-
-      // int64_t t = j / k;
-      // int64_t mod = j - k * t;
-      int mod = j % k;
-
-      while (mod != 0)
-      {
-         j = k; // asign the small one to the big one
-         k = mod;
-         // t = j / k;
-         // mod = j - k * t;
-         mod = j%k;
-      }
-      res = k;
+      res = gcd(res,pok_threads[i].weight);
    }
    return res;
 }
 
-int max_weight(uint32_t size)
+int max_weight(uint32_t index_low, uint32_t index_high)
 {
-   int weight_set[size];
+   // printf("index low = %d, index high = %d \n",index_low, index_high);
    uint32_t i;
-   for (i = 0; i < size; i++)
+   int res = pok_threads[index_low].weight;
+   for (i = index_low+1; i <= index_high; i++)
    {
-      weight_set[i]=pok_threads[i].weight;
-   }
-   int res = weight_set[1];
-   for (i = 2; i < size; i++)
-   {
-      if (res < weight_set[i])
-         res = weight_set[i];
+      if (res < pok_threads[i].weight)
+      {
+         res = pok_threads[i].weight;
+         //printf(" %d ",res);
+      }
    }
    return res;
 }
@@ -697,8 +688,7 @@ uint32_t pok_sched_part_edf(const uint32_t index_low, const uint32_t index_high,
 uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high, const uint32_t  prev_thread, const uint32_t current_thread)
 {
    uint32_t res = index_low;
-   // uint32_t from;
-   uint32_t size = index_high - index_low;
+   // uint32_t size = index_high - index_low;
    int curr_w = pok_partitions[pok_current_partition].current_weight;
 
    // IDLE THREAD 是用来保存状态的，如果当前执行的是这个线程，那么这时候前一个真正执行的现成是prev_thread
@@ -711,16 +701,14 @@ uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high,
       res = current_thread;
    }
 
-   // from = res-1;
-
    // 当前执行thread的时间片还没结束，并且还没执行完，则继续执行这个thread
-   if ((pok_threads[current_thread].remaining_time_capacity > 0) && (pok_threads[current_thread].state == POK_STATE_RUNNABLE))
-   {
-      return current_thread;
-   }
+   // if ((pok_threads[current_thread].remaining_time_capacity > 0) && (pok_threads[current_thread].state == POK_STATE_RUNNABLE))
+   // {
+   //    return current_thread;
+   // }
 
-   int gcd_w = gcd_weight(size);
-   int max_w = max_weight(size);
+   int gcd_w = gcd_weight(index_low, index_high);
+   int max_w = max_weight(index_low, index_high);
 
    do
    {
@@ -748,31 +736,27 @@ uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high,
    } while (1);
 
 
-// #ifdef POK_NEEDS_DEBUG
-//    if (res != IDLE_THREAD)
-//    {
-//       printf("--- scheduling thread: %d {weight:%d} --- \n", res,  pok_threads[res].weight);
-//       while (from <= index_high)
-//       {
-//          if (pok_threads[from].state == POK_STATE_RUNNABLE)
-//          {
-//             printf(" %d {weight=%d} ,", from, pok_threads[from].weight);
-//          }
-//          from++;
-//       }
-//       printf(" are runnable; \n");
-//       from = index_low;
-//       while (from <= index_high)
-//       {
-//          if (pok_threads[from].state != POK_STATE_RUNNABLE)
-//          {
-//             printf(" %d (state = %d)", from, pok_threads[from].state);
-//          }
-//          from++;
-//       }
-//       printf(" are NOT runnable;\n");
-//    }
-// #endif
+#ifdef POK_NEEDS_DEBUG
+   printf("gcd = %d, max = %d \n", gcd_w, max_w);
+   printf("cw = %d \n", pok_partitions[pok_current_partition].current_weight);
+   if (res != IDLE_THREAD)
+   {
+      printf("--- scheduling thread: %d {weight:%d} --- \n", res,  pok_threads[res].weight);
+      uint32_t from = index_low;
+      while (from <= index_high)
+      {
+         if (pok_threads[from].state == POK_STATE_RUNNABLE)
+         {
+            printf(" %d {weight=%d} (state = %d) is runnable; \n", from, pok_threads[from].weight, pok_threads[from].state);
+         }
+         if (pok_threads[from].state != POK_STATE_RUNNABLE)
+         {
+            printf(" %d {weight=%d} (state = %d) is NOT runnable;\n", from, pok_threads[from].weight,from, pok_threads[from].state);
+         }
+         from++;
+      }
+   }
+#endif
 
    return res;
 } /* POK_NEEDS_SCHED_WRR */

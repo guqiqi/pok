@@ -35,7 +35,7 @@ int main ()
   tattr.entry = pinger_job1;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P2] pok_thread_create (Eating) thread id=%d\n", tid);
+  printf("[P1] pok_thread_create (Eating) thread id=%d\n", tid);
 
   tattr.priority = 1;
   tattr.arrive_time = 0;
@@ -46,7 +46,7 @@ int main ()
   tattr.entry = pinger_job2;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P2] pok_thread_create (Entertainment) thread id=%d\n", tid);
+  printf("[P1] pok_thread_create (Entertainment) thread id=%d\n", tid);
 
   tattr.priority = 2;
   tattr.arrive_time = 0;
@@ -57,7 +57,7 @@ int main ()
   tattr.entry = pinger_job3;
 
   ret = pok_thread_create(&tid , &tattr);
-  printf("[P2] pok_thread_create (Housework) thread id=%d\n", tid);
+  printf("[P1] pok_thread_create (Housework) thread id=%d\n", tid);
 
   pok_partition_set_mode (POK_PARTITION_MODE_NORMAL);
   pok_thread_wait_infinite ();

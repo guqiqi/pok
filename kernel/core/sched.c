@@ -777,7 +777,7 @@ uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high,
    return res;
 } /* POK_NEEDS_SCHED_WRR */
 
-uint32_t myS = 0;
+// uint32_t myS = 0;
 uint32_t pok_sched_part_mlfq(const uint32_t index_low, const uint32_t index_high, const uint32_t __attribute__((unused)) prev_thread, const uint32_t __attribute__((unused)) current_thread)
 {
    // if(myS >= 5){

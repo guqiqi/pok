@@ -23,7 +23,6 @@
 #include "activity.h"
 
 uint8_t sid;
-
 int main ()
 {
   uint8_t tid;

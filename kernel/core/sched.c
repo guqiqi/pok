@@ -761,19 +761,19 @@ uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high,
    return res;
 } /* POK_NEEDS_SCHED_WRR */
 
-// uint32_t myS = 0;
+uint32_t myS = 0;
 uint32_t pok_sched_part_mlfq(const uint32_t index_low, const uint32_t index_high, const uint32_t __attribute__((unused)) prev_thread, const uint32_t __attribute__((unused)) current_thread)
 {
-   // if(myS >= 5){
-   //    //重置优先级到最高
-   //    for (uint32_t i = index_low + 1; i < index_high; i++)
-   //    {
-   //       pok_threads[i].priority = 3;
-   //    }
-   //    myS = 0;
-   //    printf("reset !!!!\n");
-   // }
-   // myS++;
+   if(myS >= 15){
+      //重置优先级到最高
+      for (uint32_t i = index_low + 1; i < index_high; i++)
+      {
+         pok_threads[i].priority = 3;
+      }
+      myS = 0;
+      printf("reset !!!!\n");
+   }
+   myS++;
 
    uint32_t res = index_low + 1;
    uint32_t from;

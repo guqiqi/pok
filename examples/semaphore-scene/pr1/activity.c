@@ -42,9 +42,9 @@ void* pinger_job1 ()
    {
       ret = pok_time_gettick(&time_now);
 
-      // printf ("P1 Project A: I will signal semaphores\n");
+      // printf ("P0 Project A: I will signal semaphores\n");
       ret = pok_sem_signal (sid);
-      // printf ("P1 Project A: pok_sem_signal, ret=%d\n", ret);
+      // printf ("P0 Project A: pok_sem_signal, ret=%d\n", ret);
 
       if(add_thread_num == 1 && time_now > 40000000){
          tattr.priority = 5;
@@ -63,18 +63,18 @@ void* pinger_job1 ()
       if(add_thread_num == 0 && time_now > 30000000){
          tattr.priority = 4;
          tattr.time_capacity = 1;
-         tattr.deadline = 50000000;
+         tattr.deadline = 20000000;
          tattr.period = 150000000;
          tattr.weight = 4;
          tattr.entry = pinger_job5;
 
          ret = pok_partition_thread_add(&tid , &tattr);
-         printf("[P1] pok_thread_create (Project C) thread id=%d\n", tid);
+         printf("[P0] pok_thread_create (Project C) thread id=%d\n", tid);
          
          add_thread_num = add_thread_num + 1;
       }
 
-      pok_thread_sleep (10000);
+      pok_thread_sleep (9000);
    }
 }
 
@@ -90,9 +90,9 @@ void* pinger_job2 ()
    {
       ret = pok_time_gettick(&time_now);
 
-      // printf ("P1 Project B: I will signal semaphores\n");
+      // printf ("P0 Project B: I will signal semaphores\n");
       ret = pok_sem_signal (sid);
-      // printf ("P1 Project B: pok_sem_signal, ret=%d\n", ret);
+      // printf ("P0 Project B: pok_sem_signal, ret=%d\n", ret);
 
       if(add_thread_num == 1 && time_now > 40000000){
          tattr.priority = 5;
@@ -111,7 +111,7 @@ void* pinger_job2 ()
       if(add_thread_num == 0 && time_now > 30000000){
          tattr.priority = 4;
          tattr.time_capacity = 1;
-         tattr.deadline = 50000000;
+         tattr.deadline = 20000000;
          tattr.period = 150000000;
          tattr.weight = 4;
          tattr.entry = pinger_job5;
@@ -122,7 +122,7 @@ void* pinger_job2 ()
          add_thread_num = add_thread_num + 1;
       }
 
-      pok_thread_sleep (10000);
+      pok_thread_sleep (9000);
    }
 }
 
@@ -155,17 +155,17 @@ void* pinger_job3 ()
       if(add_thread_num == 0 && time_now > 30000000){
          tattr.priority = 4;
          tattr.time_capacity = 1;
-         tattr.deadline = 50000000;
+         tattr.deadline = 20000000;
          tattr.period = 150000000;
          tattr.weight = 4;
          tattr.entry = pinger_job5;
 
          ret = pok_partition_thread_add(&tid , &tattr);
-         printf("[P1] pok_thread_create (Project C) thread id=%d\n", tid);
+         printf("[P0] pok_thread_create (Project C) thread id=%d\n", tid);
          
          add_thread_num = add_thread_num + 1;
       }
-      pok_thread_sleep (10000);
+      pok_thread_sleep (9000);
    }
 }
 
@@ -173,8 +173,7 @@ void* pinger_job4 ()
 {
    while (1)
    {
-      // printf ("P1 Eating\n");
-      pok_thread_sleep (10000);
+      pok_thread_sleep (9000);
    }
 }
 
@@ -184,10 +183,10 @@ void* pinger_job5 ()
 
    while (1)
    {
-      // printf ("P1 Project C: I will wait for the semaphores\n");
+      // printf ("P0 Project C: I will wait for the semaphores\n");
       ret = pok_sem_wait (sid, 0);
-      // printf ("P1 Project C: pok_sem_wait, ret=%d\n", ret);
+      // // printf ("P0 Project C: pok_sem_wait, ret=%d\n", ret);
 
-      pok_thread_sleep (10000);
+      pok_thread_sleep (9000);
    }
 }

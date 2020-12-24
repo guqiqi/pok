@@ -715,13 +715,28 @@ uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high,
       res++;
       if (res > index_high)
       {
+         // after a round, minus gcd
          res = index_low;
          curr_w = curr_w - gcd_w;
          pok_partitions[pok_current_partition].current_weight = curr_w;
-         if (curr_w == 0)
+         if (curr_w <= 0)
          {
-            res=IDLE_THREAD;
-            break;
+            curr_w = max_w;
+            pok_partitions[pok_current_partition].current_weight = curr_w;
+
+            // check if all the threads are not runnable;
+            int flag = 0;
+            uint32_t index = index_low;
+            while (index <= index_high){
+               if(pok_threads[index].state == POK_STATE_RUNNABLE)
+                  flag = 1;
+               index++;
+            }
+            if (flag == 0)
+            {
+               res = IDLE_THREAD;
+               break;
+            }
          }
       }
       if (pok_partitions[pok_current_partition].current_weight == 0){
@@ -736,27 +751,27 @@ uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high,
    } while (1);
 
 
-#ifdef POK_NEEDS_DEBUG
-   printf("gcd = %d, max = %d \n", gcd_w, max_w);
-   printf("cw = %d \n", pok_partitions[pok_current_partition].current_weight);
-   if (res != IDLE_THREAD)
-   {
-      printf("--- scheduling thread: %d {weight:%d} --- \n", res,  pok_threads[res].weight);
-      uint32_t from = index_low;
-      while (from <= index_high)
-      {
-         if (pok_threads[from].state == POK_STATE_RUNNABLE)
-         {
-            printf(" %d {weight=%d} (state = %d) is runnable; \n", from, pok_threads[from].weight, pok_threads[from].state);
-         }
-         if (pok_threads[from].state != POK_STATE_RUNNABLE)
-         {
-            printf(" %d {weight=%d} (state = %d) is NOT runnable;\n", from, pok_threads[from].weight,from, pok_threads[from].state);
-         }
-         from++;
-      }
-   }
-#endif
+// #ifdef POK_NEEDS_DEBUG
+//    printf("gcd = %d, max = %d \n", gcd_w, max_w);
+//    printf("cw = %d \n", pok_partitions[pok_current_partition].current_weight);
+//    if (res != IDLE_THREAD)
+//    {
+//       printf("--- scheduling thread: %d {weight:%d} --- \n", res,  pok_threads[res].weight);
+//       uint32_t from = index_low;
+//       while (from <= index_high)
+//       {
+//          if (pok_threads[from].state == POK_STATE_RUNNABLE)
+//          {
+//             printf(" %d {weight=%d} (state = %d) is runnable; \n", from, pok_threads[from].weight, pok_threads[from].state);
+//          }
+//          if (pok_threads[from].state != POK_STATE_RUNNABLE)
+//          {
+//             printf(" %d {weight=%d} (state = %d) is NOT runnable;\n", from, pok_threads[from].weight,from, pok_threads[from].state);
+//          }
+//          from++;
+//       }
+//    }
+// #endif
 
    return res;
 } /* POK_NEEDS_SCHED_WRR */
